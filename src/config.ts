@@ -1,13 +1,9 @@
-import { ImmutableObject } from 'jimu-core';
+import { type ImmutableObject } from 'jimu-core'
 
-export interface SavedView {
-  id: string;
-  label: string;
-  urlData: string;
+export interface ISavedView {
+  id: string
+  label: string
+  urlData: string
 }
-
-export interface Config {
-  predefinedViews: SavedView[];
-}
-
-export type IMConfig = ImmutableObject<Config>;
+export interface IConfig { predefinedViews: ISavedView[] }
+export type IMConfig = ImmutableObject<IConfig>

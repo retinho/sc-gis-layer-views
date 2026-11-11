@@ -1,0 +1,9 @@
+{
+  "name": "sc-gis-layer-views-tests",
+  "private": true,
+  "scripts": { "test": "node run.cjs" },
+  "devDependencies": {
+    "@arcgis/core": "4.32.12",
+    "typescript": "5.7.3"
+  }
+}

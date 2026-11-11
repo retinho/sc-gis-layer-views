@@ -1,0 +1,122 @@
+const assert = require('node:assert/strict')
+const { test } = require('node:test')
+const Module = require('node:module')
+const path = require('node:path')
+
+// Deliberately small SDK doubles: tests exercise map mutation and async sequencing, not SDK rendering.
+class Collection {
+  constructor(items = []) { this.items = items }
+  toArray() { return [...this.items] }
+  filter(fn) { return new Collection(this.items.filter(fn)) }
+  find(fn) { return this.items.find(fn) }
+  some(fn) { return this.items.some(fn) }
+}
+class Layer {
+  constructor(props = {}) { Object.assign(this, { visible: true, opacity: 1, title: '', type: 'feature' }, props) }
+  async load() { if (this.url?.includes('/fail')) throw new Error('Network error'); return this }
+  destroy() { this.destroyed = true }
+}
+class WmsSublayer {
+  constructor(props = {}) { Object.assign(this, { visible: true }, props); this.sublayers = props.sublayers instanceof Collection ? props.sublayers : new Collection(props.sublayers ?? []) }
+  clone() { return new WmsSublayer({ ...this, sublayers: this.sublayers.toArray().map(x => x.clone()) }) }
+}
+class WmtsSublayer { constructor(props = {}) { Object.assign(this, props) } }
+class WmsLayer extends Layer {
+  constructor(props) { super(props); this.type = 'wms'; this.sublayers = new Collection([new WmsSublayer({ name: 'water', title: 'Service metadata' })]) }
+}
+class WmtsLayer extends Layer {
+  constructor(props) { super(props); this.type = 'wmts'; this.serviceMode = props.serviceMode ?? 'RESTful'; this.sublayers = new Collection([new WmtsSublayer({ id: 'tiles', styles: [{ id: 'grey' }], tileMatrixSets: [{ id: '2056' }] })]); this.activeLayer ??= this.sublayers.toArray()[0] }
+}
+class GroupLayer extends Layer { constructor(props) { super(props); this.layers = new Collection(props.layers) } }
+class MapDouble {
+  constructor(layers = []) { this.layers = new Collection(layers) }
+  findLayerById(id) {
+    const find = layers => layers.flatMap(layer => layer instanceof GroupLayer ? [layer, ...layer.layers.toArray()] : [layer]).find(layer => layer.id === id)
+    return find(this.layers.toArray())
+  }
+  removeMany(layers) { this.layers.items = this.layers.items.filter(layer => !layers.includes(layer)) }
+  addMany(layers) { this.layers.items.push(...layers) }
+}
+const mocks = {
+  'esri/core/Collection': Collection, 'esri/layers/GroupLayer': GroupLayer,
+  'esri/layers/WMSLayer': WmsLayer, 'esri/layers/WMTSLayer': WmtsLayer,
+  'esri/layers/support/WMSSublayer': WmsSublayer, 'esri/layers/support/WMTSSublayer': WmtsSublayer
+}
+const originalLoad = Module._load
+let api
+try {
+  Module._load = function (id, parent, main) { return mocks[id] ? { default: mocks[id] } : originalLoad.call(this, id, parent, main) }
+  api = require(path.join(process.env.VIEW_TEST_BUILD, 'map-state.js'))
+} finally { Module._load = originalLoad }
+const service = (extra = {}) => ({ id: 'existing', type: 'WMS', url: 'https://host/wms', title: 'Water', visible: false, opacity: 0.3, sublayers: [{ name: 'water', visible: false, sublayers: [] }], ...extra })
+const state = external => ({ version: 2, internal: [], external })
+
+test('repeated activation reuses existing WMS and preserves service metadata', async () => {
+  const layer = new WmsLayer({ id: 'existing', url: 'https://host/wms' })
+  const map = new MapDouble([layer])
+  await api.applyMapState(map, state([service()]), () => true)
+  await api.applyMapState(map, state([service()]), () => true)
+  assert.equal(map.layers.toArray().length, 1)
+  assert.equal(layer.visible, false)
+  assert.equal(layer.opacity, 0.3)
+  assert.equal(layer.sublayers.toArray()[0].title, 'Service metadata')
+  assert.equal(layer.sublayers.toArray()[0].visible, false)
+})
+test('legacy links match existing services by URL without adding duplicates', async () => {
+  const layer = new WmsLayer({ id: 'existing', url: 'https://host/wms' })
+  const map = new MapDouble([layer])
+  await api.applyMapState(map, state([service({ id: undefined })]), () => true)
+  assert.deepEqual(map.layers.toArray(), [layer])
+})
+test('captures nested operational layers and excludes basemaps', async () => {
+  const layer = new WmsLayer({ id: 'nested', url: 'https://host/wms' })
+  const map = new MapDouble([new GroupLayer({ id: 'group', layers: [layer] })])
+  map.basemap = { baseLayers: new Collection([new Layer({ id: 'base' })]) }
+  const captured = await api.captureMapState(map)
+  assert.deepEqual(captured.internal.map(item => item.id), ['group', 'nested'])
+  assert.equal(captured.external[0].id, 'nested')
+})
+test('network failure leaves existing visibility and managed layers intact', async () => {
+  const layer = new WmsLayer({ id: 'existing', url: 'https://host/wms' })
+  const previous = new WmsLayer({ id: 'sc_ext_old', url: 'https://host/old' })
+  const map = new MapDouble([layer, previous])
+  await assert.rejects(api.applyMapState(map, state([service(), service({ id: 'bad', url: 'https://host/fail' })]), () => true))
+  assert.equal(layer.visible, true)
+  assert.deepEqual(map.layers.toArray(), [layer, previous])
+  assert.equal(previous.destroyed, undefined)
+})
+test('cancelled restore never changes the map', async () => {
+  const layer = new WmsLayer({ id: 'existing', url: 'https://host/wms' })
+  const map = new MapDouble([layer])
+  assert.equal(await api.applyMapState(map, state([service(), service({ id: 'new', url: 'https://host/new' })]), () => false), false)
+  assert.equal(layer.visible, true)
+  assert.equal(map.layers.toArray().length, 1)
+})
+test('replaces obsolete managed services, keeping unrelated map layers', async () => {
+  const old = new WmsLayer({ id: 'sc_ext_old', url: 'https://host/old' })
+  const feature = new Layer({ id: 'feature' })
+  const map = new MapDouble([old, feature])
+  await api.applyMapState(map, state([service({ id: 'sc_ext_new' })]), () => true)
+  assert.equal(old.destroyed, true)
+  assert.equal(map.layers.toArray().length, 2)
+  assert.equal(map.findLayerById('feature'), feature)
+  assert.equal(map.findLayerById('sc_ext_new').visible, false)
+})
+test('restores WMTS active selection and rejects unavailable styles before mutation', async () => {
+  const layer = new WmtsLayer({ id: 'tiles', url: 'https://host/wmts' })
+  const map = new MapDouble([layer])
+  const selected = { id: 'tiles', styleId: 'grey', tileMatrixSetId: '2056', imageFormat: 'image/png' }
+  const snapshot = { ...service({ id: 'tiles', url: layer.url }), type: 'WMTS', activeLayer: selected, serviceMode: 'RESTful' }
+  await api.applyMapState(map, state([snapshot]), () => true)
+  assert.equal(layer.activeLayer.styleId, 'grey')
+  await assert.rejects(api.applyMapState(map, state([{ ...snapshot, visible: true, activeLayer: { ...selected, styleId: 'missing' } }]), () => true))
+  assert.equal(layer.visible, false)
+  assert.equal(layer.activeLayer.styleId, 'grey')
+})
+test('an unrelated layer with no usable URL does not block restoring other services', async () => {
+  const broken = new WmsLayer({ id: 'unrelated', url: '' })
+  const map = new MapDouble([broken])
+  await api.applyMapState(map, state([service({ id: 'sc_ext_new' })]), () => true)
+  assert.equal(map.layers.toArray().length, 2)
+  assert.equal(map.findLayerById('unrelated'), broken)
+})

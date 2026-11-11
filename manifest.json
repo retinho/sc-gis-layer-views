@@ -2,17 +2,24 @@
   "name": "sc-gis-layer-views",
   "label": "Layer View Serializer",
   "type": "widget",
-  "version": "1.0.0",
-  "sdkVersion": "1.15.0",
+  "version": "1.1.0",
+  "sdkVersion": "1.17.0",
   "author": "SC-GIS",
-  "description": "Speichert Kartenkonfigurationen inkl. WMS via URL.",
+  "description": "Save and restore layer visibility and WMS/WMTS services using shareable URLs.",
   "properties": {
     "configurable": true,
     "hasConfig": true,
     "supportMultiInstance": true
   },
-  "dependency": ["jimu-arcgis"],
+  "dependency": [
+    "jimu-arcgis"
+  ],
   "settingConfig": {
     "main": "setting/setting"
-  }
+  },
+  "translatedLocales": [
+    "en",
+    "de",
+    "fr"
+  ]
 }

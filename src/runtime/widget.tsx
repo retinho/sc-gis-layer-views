@@ -1,105 +1,55 @@
-import { React, type AllWidgetProps } from 'jimu-core';
-import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis';
-import { Button, TextArea, Label } from 'jimu-ui';
-import WMSLayer from 'esri/layers/WMSLayer';
-import WMTSLayer from 'esri/layers/WMTSLayer';
-import { type IMConfig } from '../config';
+import { React, type AllWidgetProps } from 'jimu-core'
+import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
+import { CalciteButton, CalciteLabel, CalciteLoader, CalciteTextArea } from 'calcite-components'
+import { type IMConfig } from '../config'
+import { useMapViews } from './hooks/use-map-views'
+import { calciteThemeStyle } from '../theme'
+import messages from './translations/default'
 
-export default function Widget(props: AllWidgetProps<IMConfig>) {
-  const { config, useMapWidgetIds } = props;
-  const [jmv, setJmv] = React.useState<JimuMapView>(null);
-  const [generatedUrl, setGeneratedUrl] = React.useState('');
+interface IActiveMap { widgetId: string | undefined; view: JimuMapView | null }
 
-  React.useEffect(() => {
-    if (jmv) {
-      const params = new URLSearchParams(window.location.search);
-      const data = params.get('view_state');
-      if (data) applyViewState(data);
-    }
-  }, [jmv]);
-
-  const onActiveViewChange = (jimuMapView: JimuMapView) => {
-    if (jimuMapView) setJmv(jimuMapView);
-  };
-
-  const captureCurrentState = () => {
-    if (!jmv) return;
-    const map = jmv.view.map;
-
-    const state = {
-      internal: map.allLayers
-        .filter(l => !l.id.startsWith('sc_ext_') && !l.id.includes('basemap'))
-        .map(l => ({ id: l.id, visible: l.visible }))
-        .toArray(),
-      external: map.layers
-        .filter(l => l.id.startsWith('sc_ext_') || l.type === 'wms' || l.type === 'wmts')
-        .map((l: any) => ({
-          url: l.url,
-          title: l.title,
-          type: l.type.toUpperCase(),
-          opacity: l.opacity,
-          sublayers: l.sublayers ? l.sublayers.map(s => ({ name: s.name, title: s.title })).toArray() : []
-        }))
-        .toArray()
-    };
-
-    const base64 = btoa(JSON.stringify(state));
-    const fullUrl = `${window.location.origin}${window.location.pathname}?view_state=${base64}`;
-    setGeneratedUrl(fullUrl);
-    navigator.clipboard.writeText(fullUrl);
-  };
-
-  const applyViewState = (base64Data: string) => {
-    try {
-      const state = JSON.parse(atob(base64Data));
-      const map = jmv.view.map;
-
-      state.internal.forEach(s => {
-        const l = map.findLayerById(s.id);
-        if (l) l.visible = s.visible;
-      });
-
-      const oldExt = map.layers.filter(l => l.id.startsWith('sc_ext_')).toArray();
-      map.removeMany(oldExt);
-
-      state.external.forEach((ext, i) => {
-        const layerProps = {
-          url: ext.url,
-          id: `sc_ext_${Date.now()}_${i}`,
-          title: ext.title,
-          opacity: ext.opacity,
-          sublayers: ext.sublayers
-        };
-        const newLayer = ext.type === 'WMTS' ? new WMTSLayer(layerProps) : new WMSLayer(layerProps);
-        map.add(newLayer);
-      });
-    } catch (e) {
-      console.error("View-Status konnte nicht geladen werden", e);
-    }
-  };
-
+export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElement {
+  const [active, setActive] = React.useState<IActiveMap | null>(null)
+  const mapWidgetId = props.useMapWidgetIds?.[0]
+  const jmv = active?.widgetId === mapWidgetId ? active?.view ?? null : null
+  const views = useMapViews(mapWidgetId ? jmv : null)
+  const t = (key: keyof typeof messages): string => props.intl.formatMessage({ id: key, defaultMessage: messages[key] })
+  const onActiveViewChange = React.useCallback((view: JimuMapView | undefined): void => {
+    setActive({ widgetId: mapWidgetId, view: view ?? null })
+  }, [mapWidgetId])
+  const predefined = props.config?.predefinedViews
+  const error = ['invalidView', 'loadFailed', 'captureFailed'].includes(views.message)
   return (
-    <div className="widget-url-serializer jimu-widget p-3" style={{ backgroundColor: '#fff', overflowY: 'auto' }}>
-      <JimuMapViewComponent useMapWidgetId={useMapWidgetIds?.[0]} onActiveViewChange={onActiveViewChange} />
-      
-      <div className="admin-section border-bottom pb-3 mb-3">
-        <Label className="font-weight-bold">Admin: Sicht generieren</Label>
-        <Button className="w-100 mb-2" type="primary" onClick={captureCurrentState}>
-          Aktuelle Sicht als URL kopieren
-        </Button>
-        {generatedUrl && (
-          <TextArea readOnly value={generatedUrl} style={{ height: '80px', fontSize: '12px' }} />
-        )}
-      </div>
-
-      <div className="user-section">
-        <Label className="font-weight-bold">Vordefinierte Ansichten</Label>
-        {config.predefinedViews?.map((view) => (
-          <Button key={view.id} className="w-100 mb-2" type="default" onClick={() => applyViewState(view.urlData)}>
-            {view.label}
-          </Button>
+    <div className={`widget-sc-gis-layer-views jimu-widget p-3 ${props.theme.darkTheme ? 'calcite-mode-dark' : 'calcite-mode-light'}`}
+      style={{ ...calciteThemeStyle, overflowY: 'auto', height: '100%' }}
+      aria-busy={views.busy}>
+      {mapWidgetId && <JimuMapViewComponent key={mapWidgetId} useMapWidgetId={mapWidgetId} onActiveViewChange={onActiveViewChange} />}
+      {!mapWidgetId && <p>{t('selectMap')}</p>}
+      {mapWidgetId && !jmv && <p>{t('waitingForMap')}</p>}
+      {views.busy && <CalciteLoader label={t('loading')} scale="s" />}
+      <section className="mb-3" aria-labelledby={`${props.id}-capture`}>
+        <h3 id={`${props.id}-capture`} className="h6">{t('captureTitle')}</h3>
+        <CalciteButton width="full" disabled={!views.ready || views.busy} onClick={(): void => { void views.capture() }}>
+          {t('capture')}
+        </CalciteButton>
+        {views.generatedUrl && <CalciteLabel className="mt-2">{t('generatedUrl')}
+          <CalciteTextArea readOnly value={views.generatedUrl} rows={3} />
+        </CalciteLabel>}
+      </section>
+      <section aria-labelledby={`${props.id}-views`}>
+        <h3 id={`${props.id}-views`} className="h6">{t('predefinedViews')}</h3>
+        {!predefined?.length && <p>{t('noViews')}</p>}
+        {predefined?.map((view): React.ReactElement => (
+          <CalciteButton key={view.id} className="mb-2" width="full" appearance="outline"
+            disabled={!views.ready || views.busy || !view.urlData}
+            onClick={(): void => { void views.apply(view.urlData) }}>
+            {view.label || t('unnamedView')}
+          </CalciteButton>
         ))}
+      </section>
+      <div role={error ? 'alert' : 'status'} aria-live={error ? 'assertive' : 'polite'}>
+        {views.message !== 'ready' && t(views.message)}
       </div>
     </div>
-  );
+  )
 }

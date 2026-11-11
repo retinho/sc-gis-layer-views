@@ -2,7 +2,7 @@
 
 Custom Widget für **ArcGIS Enterprise 11.5 / Experience Builder Developer Edition 1.17 / ArcGIS Maps SDK 4.32**.
 
-Das Widget speichert die Sichtbarkeit der operativen Layer sowie WMS-/WMTS-Dienste in einem teilbaren Link. Vordefinierte Ansichten werden im Einstellungsbereich gepflegt. Version 1.1.0 verbessert das bestehende Verhalten; Kartenausschnitt, Zoom und Layer-Reihenfolge sind weiterhin nicht Bestandteil einer gespeicherten Ansicht.
+Das Widget speichert die Sichtbarkeit der operativen Layer sowie WMS-/WMTS-Dienste in einem teilbaren Link. Vordefinierte Ansichten werden im Einstellungsbereich gepflegt. Version 1.2.0 verbessert das bestehende Verhalten; Kartenausschnitt, Zoom und Layer-Reihenfolge sind weiterhin nicht Bestandteil einer gespeicherten Ansicht.
 
 ## Kompilieren und bereitstellen
 
@@ -14,6 +14,17 @@ Das Widget speichert die Sichtbarkeit der operativen Layer sowie WMS-/WMTS-Diens
 6. Nach dem Update eine bestehende Experience und eine neu angelegte Experience prüfen. Browser-/Webserver-Caches bei Bedarf aktualisieren.
 
 React, Jimu, ArcGIS und Calcite werden aus der Developer Edition verwendet. Keine zusätzlichen Laufzeitbibliotheken in den Widget-Ordner installieren. Calcite-Komponenten werden über den vom Host bereitgestellten Einstieg `calcite-components` importiert.
+
+## Einstellungen je Layer-Thema
+
+Unter jeder vordefinierten Ansicht lassen sich zusätzliche WMS-/WMTS-Dienste konfigurieren:
+
+- **Position im Themenbaum:** Unten (Standard) oder Oben. Unten entspricht Index 0 des operativen Kartenstapels und liegt weiterhin über der Basemap. Die Zeichenreihenfolge der Karte ändert sich entsprechend mit.
+- **Sichtbarkeit beim Aktivieren:** Gespeicherte Sichtbarkeit übernehmen (Standard), Aktiviert oder Deaktiviert. Die Auswahl gilt gemeinsam für die durch das Widget hinzugefügten Dienste des Themas und wird bei jedem Aktivieren erneut angewendet.
+
+Die Optionen gelten auch für wiederverwendete Dienste mit dem reservierten Präfix `sc_ext_`. Ursprüngliche WebMap-Layer werden nicht verschoben und erhalten weiterhin ihre gespeicherte Sichtbarkeit. Dienste innerhalb bestehender Gruppen werden nicht aus ihren Gruppen gelöst. Deaktivierte zusätzliche Dienste bleiben im Themenbaum verfügbar und können dort später eingeschaltet werden.
+
+Bestehende Konfigurationen ohne diese Optionen verwenden Unten und die gespeicherte Sichtbarkeit. Direkt aufgerufene `view_state`-URLs verwenden ebenfalls diese Standardwerte; die Optionen einer vordefinierten Ansicht werden beim Klick auf deren Themen-Schaltfläche angewendet.
 
 ## Verhalten und Kompatibilität
 

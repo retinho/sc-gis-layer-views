@@ -7,6 +7,8 @@ const path = require('node:path')
 class Collection {
   constructor(items = []) { this.items = items }
   toArray() { return [...this.items] }
+  get length() { return this.items.length }
+  includes(item) { return this.items.includes(item) }
   filter(fn) { return new Collection(this.items.filter(fn)) }
   find(fn) { return this.items.find(fn) }
   some(fn) { return this.items.some(fn) }
@@ -36,6 +38,7 @@ class MapDouble {
   }
   removeMany(layers) { this.layers.items = this.layers.items.filter(layer => !layers.includes(layer)) }
   addMany(layers) { this.layers.items.push(...layers) }
+  reorder(layer, index) { this.layers.items = this.layers.items.filter(item => item !== layer); this.layers.items.splice(index, 0, layer) }
 }
 const mocks = {
   'esri/core/Collection': Collection, 'esri/layers/GroupLayer': GroupLayer,
@@ -158,4 +161,54 @@ test('external service selection also enables its existing WebMap group', async 
   await api.applyMapState(new MapDouble([group]), state([service({ visible: true })]), () => true)
   assert.equal(group.visible, true)
   assert.equal(child.visible, true)
+})
+test('new services are inserted below WebMap layers by default, preserving their relative order', async () => {
+  const base = new Layer({ id: 'webmap' })
+  const map = new MapDouble([base])
+  const snapshot = state([service({ id: 'sc_ext_a' }), service({ id: 'sc_ext_b', url: 'https://host/b' })])
+  await api.applyMapState(map, snapshot, () => true)
+  assert.deepEqual(map.layers.toArray().map(layer => layer.id), ['sc_ext_a', 'sc_ext_b', 'webmap'])
+  await api.applyMapState(map, snapshot, () => true)
+  assert.deepEqual(map.layers.toArray().map(layer => layer.id), ['sc_ext_a', 'sc_ext_b', 'webmap'])
+})
+test('admin can move the same added services to top and back to bottom', async () => {
+  const map = new MapDouble([new Layer({ id: 'webmap' })])
+  const snapshot = state([service({ id: 'sc_ext_a' }), service({ id: 'sc_ext_b', url: 'https://host/b' })])
+  await api.applyMapState(map, snapshot, () => true, { externalLayerPosition: 'top' })
+  assert.deepEqual(map.layers.toArray().map(layer => layer.id), ['webmap', 'sc_ext_a', 'sc_ext_b'])
+  await api.applyMapState(map, snapshot, () => true, { externalLayerPosition: 'bottom' })
+  assert.deepEqual(map.layers.toArray().map(layer => layer.id), ['sc_ext_a', 'sc_ext_b', 'webmap'])
+})
+test('disabled services stay in the tree and internal snapshots cannot override the admin choice', async () => {
+  const map = new MapDouble()
+  const snapshot = { ...state([service({ id: 'sc_ext_a', visible: true })]), internal: [{ id: 'sc_ext_a', visible: true }] }
+  await api.applyMapState(map, snapshot, () => true, { externalLayerVisibility: 'hidden' })
+  assert.equal(map.findLayerById('sc_ext_a').visible, false)
+  assert.equal(map.layers.length, 1)
+  map.findLayerById('sc_ext_a').visible = true
+  await api.applyMapState(map, snapshot, () => true, { externalLayerVisibility: 'hidden' })
+  assert.equal(map.findLayerById('sc_ext_a').visible, false)
+})
+test('enabled overrides a saved false visibility for added WMS and WMTS services', async () => {
+  const map = new MapDouble()
+  const snapshot = state([service({ id: 'sc_ext_a', visible: false }), { type: 'WMTS', id: 'sc_ext_b', url: 'https://host/wmts', title: 'Tiles', opacity: 1, visible: false }])
+  await api.applyMapState(map, snapshot, () => true, { externalLayerVisibility: 'visible' })
+  assert.equal(map.findLayerById('sc_ext_a').visible, true)
+  assert.equal(map.findLayerById('sc_ext_b').visible, true)
+})
+test('saved default preserves mixed visibility of added services', async () => {
+  const map = new MapDouble()
+  await api.applyMapState(map, state([service({ id: 'sc_ext_a', visible: false }), service({ id: 'sc_ext_b', url: 'https://host/b', visible: true })]), () => true)
+  assert.equal(map.findLayerById('sc_ext_a').visible, false)
+  assert.equal(map.findLayerById('sc_ext_b').visible, true)
+})
+test('admin overrides do not move or disable original WebMap services', async () => {
+  const wms = new WmsLayer({ id: 'existing', url: 'https://host/wms' })
+  const feature = new Layer({ id: 'feature' })
+  const map = new MapDouble([feature, wms])
+  await api.applyMapState(map, state([service({ visible: true }), service({ id: 'sc_ext_new', url: 'https://host/new' })]), () => true,
+    { externalLayerPosition: 'bottom', externalLayerVisibility: 'hidden' })
+  assert.deepEqual(map.layers.toArray().map(layer => layer.id), ['sc_ext_new', 'feature', 'existing'])
+  assert.equal(wms.visible, true)
+  assert.equal(map.findLayerById('sc_ext_new').visible, false)
 })

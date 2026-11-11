@@ -1,6 +1,8 @@
 import { type ImmutableObject } from 'jimu-core'
 
-export interface ISavedView {
+import { type IViewOptions } from './runtime/utils/view-options'
+
+export interface ISavedView extends IViewOptions {
   id: string
   label: string
   urlData: string

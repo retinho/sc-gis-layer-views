@@ -1,7 +1,8 @@
 import { React, Immutable } from 'jimu-core'
 import { type AllWidgetSettingProps } from 'jimu-for-builder'
 import { SettingSection, MapWidgetSelector } from 'jimu-ui/advanced/setting-components'
-import { CalciteButton, CalciteInput, CalciteLabel } from 'calcite-components'
+import { CalciteButton, CalciteInput, CalciteLabel, CalciteSelect, CalciteOption } from 'calcite-components'
+import { type IViewOptions } from '../runtime/utils/view-options'
 import { type IConfig, type IMConfig, type ISavedView } from '../config'
 import { decodeViewState, extractViewData } from '../runtime/utils/view-state'
 import { calciteThemeStyle } from '../theme'
@@ -36,6 +37,9 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>): React.R
     }
     save(getViews().map((view: ISavedView): ISavedView => view.id === viewId ? { ...view, [field]: normalized } : view))
   }
+  const updateOptions = (viewId: string, options: IViewOptions): void => {
+    save(getViews().map((view: ISavedView): ISavedView => view.id === viewId ? { ...view, ...options } : view))
+  }
   const deleteView = (viewId: string): void => {
     save(getViews().filter((view: ISavedView): boolean => view.id !== viewId))
     setInvalidIds((previous: ReadonlySet<string>): ReadonlySet<string> => {
@@ -62,6 +66,28 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>): React.R
               <CalciteInput value={view.urlData} status={invalidIds.has(view.id) ? 'invalid' : 'idle'}
                 onCalciteInputChange={(event): void => { updateView(view.id, 'urlData', event.target.value) }} />
             </CalciteLabel>
+            <CalciteLabel>{t('externalLayerPosition')}
+              <CalciteSelect value={view.externalLayerPosition ?? 'bottom'}
+                onCalciteSelectChange={(event): void => {
+                  const value = event.target.value
+                  if (value === 'top' || value === 'bottom') updateOptions(view.id, { externalLayerPosition: value })
+                }}>
+                <CalciteOption value="bottom">{t('positionBottom')}</CalciteOption>
+                <CalciteOption value="top">{t('positionTop')}</CalciteOption>
+              </CalciteSelect>
+            </CalciteLabel>
+            <CalciteLabel>{t('externalLayerVisibility')}
+              <CalciteSelect value={view.externalLayerVisibility ?? 'saved'}
+                onCalciteSelectChange={(event): void => {
+                  const value = event.target.value
+                  if (value === 'saved' || value === 'visible' || value === 'hidden') updateOptions(view.id, { externalLayerVisibility: value })
+                }}>
+                <CalciteOption value="saved">{t('visibilitySaved')}</CalciteOption>
+                <CalciteOption value="visible">{t('visibilityVisible')}</CalciteOption>
+                <CalciteOption value="hidden">{t('visibilityHidden')}</CalciteOption>
+              </CalciteSelect>
+            </CalciteLabel>
+            <p className="small">{t('externalOptionsHint')}</p>
             {invalidIds.has(view.id) && <p role="alert">{t('invalidView')}</p>}
             <CalciteButton width="full" kind="danger" appearance="outline" label={`${t('deleteView')}: ${view.label}`}
               onClick={(): void => { deleteView(view.id) }}>{t('deleteView')}</CalciteButton>

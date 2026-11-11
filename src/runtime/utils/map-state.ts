@@ -6,6 +6,8 @@ import WMSSublayer from 'esri/layers/support/WMSSublayer'
 import WMTSSublayer from 'esri/layers/support/WMTSSublayer'
 import { type IService, type IViewState, type IWmsSublayer } from './view-state'
 
+import { type IViewOptions } from './view-options'
+
 type OgcLayer = WMSLayer | WMTSLayer
 const MANAGED_PREFIX = 'sc_ext_'
 function operationalLayers(map: __esri.Map): __esri.Layer[] {
@@ -103,7 +105,7 @@ function sameService(layer: OgcLayer, state: IService): boolean {
 interface IPreparedLayer { layer: OgcLayer; state: IService; created: boolean }
 
 /** Load all new services before changing the map; cancelled requests never commit. */
-export async function applyMapState(map: __esri.Map, state: IViewState, isCurrent: () => boolean): Promise<boolean> {
+export async function applyMapState(map: __esri.Map, state: IViewState, isCurrent: () => boolean, options: IViewOptions = {}): Promise<boolean> {
   const existing = operationalLayers(map).filter(isOgc)
   const used = new Set<OgcLayer>()
   const prepared: IPreparedLayer[] = []
@@ -149,10 +151,25 @@ export async function applyMapState(map: __esri.Map, state: IViewState, isCurren
     map.removeMany(obsolete)
     obsolete.forEach((layer: __esri.Layer): void => { layer.destroy() })
     map.addMany(prepared.filter((item: IPreparedLayer): boolean => item.created).map((item: IPreparedLayer): OgcLayer => item.layer))
+    // Index zero is the bottom of the operational stack / standard layer tree.
+    // Do not move pre-existing WebMap services or pull children out of groups.
+    const addedServices = prepared.filter((item: IPreparedLayer): boolean =>
+      item.created || item.layer.id.startsWith(MANAGED_PREFIX))
+    const topLevelServices = addedServices.filter((item: IPreparedLayer): boolean => map.layers.includes(item.layer))
+    if (options.externalLayerPosition === 'top') {
+      topLevelServices.forEach((item: IPreparedLayer): void => { map.reorder(item.layer, map.layers.length - 1) })
+    } else {
+      topLevelServices.forEach((item: IPreparedLayer, index: number): void => { map.reorder(item.layer, index) })
+    }
     const desired = new Map(prepared.map((item: IPreparedLayer): [string, boolean] => [item.layer.id, item.state.visible]))
     state.internal.forEach((visibility: { id: string; visible: boolean }): void => {
       desired.set(visibility.id, visibility.visible)
     })
+    // Explicit admin choices take precedence over both service and internal snapshots.
+    if (options.externalLayerVisibility === 'visible' || options.externalLayerVisibility === 'hidden') {
+      const visible = options.externalLayerVisibility === 'visible'
+      addedServices.forEach((item: IPreparedLayer): void => { desired.set(item.layer.id, visible) })
+    }
     restoreVisibility(map, desired)
     return true
   } finally {

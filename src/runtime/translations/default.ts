@@ -21,5 +21,13 @@ export default {
   "newView": "New view",
   "viewTitle": "Name",
   "viewData": "View data (Base64 or full URL)",
-  "deleteView": "Delete view"
+  "deleteView": "Delete view",
+  "externalLayerPosition": "Added services: position in layer tree",
+  "positionBottom": "Bottom",
+  "positionTop": "Top",
+  "externalLayerVisibility": "Added services: visibility when activating the theme",
+  "visibilitySaved": "Use saved visibility",
+  "visibilityVisible": "Enabled",
+  "visibilityHidden": "Disabled",
+  "externalOptionsHint": "Applies to services added by this widget. Existing WebMap layers retain their saved settings."
 }

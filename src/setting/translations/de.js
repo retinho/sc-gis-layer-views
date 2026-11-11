@@ -22,6 +22,14 @@ System.register([], function (_export) {
   "newView": "Neue Ansicht",
   "viewTitle": "Bezeichnung",
   "viewData": "Ansichtsdaten (Base64 oder vollständige URL)",
-  "deleteView": "Ansicht löschen"
+  "deleteView": "Ansicht löschen",
+  "externalLayerPosition": "Hinzugefügte Dienste: Position im Themenbaum",
+  "positionBottom": "Unten",
+  "positionTop": "Oben",
+  "externalLayerVisibility": "Hinzugefügte Dienste: Sichtbarkeit beim Aktivieren des Themas",
+  "visibilitySaved": "Gespeicherte Sichtbarkeit übernehmen",
+  "visibilityVisible": "Aktiviert",
+  "visibilityHidden": "Deaktiviert",
+  "externalOptionsHint": "Gilt für Dienste, die dieses Widget hinzufügt. Bestehende WebMap-Layer behalten ihre gespeicherten Einstellungen."
 }); } };
 });

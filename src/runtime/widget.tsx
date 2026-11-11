@@ -42,7 +42,7 @@ export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElem
         {predefined?.map((view): React.ReactElement => (
           <CalciteButton key={view.id} className="mb-2" width="full" appearance="outline"
             disabled={!views.ready || views.busy || !view.urlData}
-            onClick={(): void => { void views.apply(view.urlData) }}>
+            onClick={(): void => { void views.apply(view.urlData, { externalLayerPosition: view.externalLayerPosition, externalLayerVisibility: view.externalLayerVisibility }) }}>
             {view.label || t('unnamedView')}
           </CalciteButton>
         ))}

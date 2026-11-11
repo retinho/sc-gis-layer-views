@@ -22,6 +22,14 @@ System.register([], function (_export) {
   "newView": "Nouvelle vue",
   "viewTitle": "Nom",
   "viewData": "Données de la vue (Base64 ou URL complète)",
-  "deleteView": "Supprimer la vue"
+  "deleteView": "Supprimer la vue",
+  "externalLayerPosition": "Services ajoutés : position dans l’arbre des couches",
+  "positionBottom": "En bas",
+  "positionTop": "En haut",
+  "externalLayerVisibility": "Services ajoutés : visibilité à l’activation du thème",
+  "visibilitySaved": "Utiliser la visibilité enregistrée",
+  "visibilityVisible": "Activés",
+  "visibilityHidden": "Désactivés",
+  "externalOptionsHint": "S’applique aux services ajoutés par ce widget. Les couches existantes de la carte conservent leurs paramètres enregistrés."
 }); } };
 });

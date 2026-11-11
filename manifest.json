@@ -2,7 +2,7 @@
   "name": "sc-gis-layer-views",
   "label": "Layer View Serializer",
   "type": "widget",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "sdkVersion": "1.17.0",
   "author": "SC-GIS",
   "description": "Save and restore layer visibility and WMS/WMTS services using shareable URLs.",

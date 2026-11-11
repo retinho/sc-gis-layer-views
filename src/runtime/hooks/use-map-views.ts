@@ -1,5 +1,6 @@
 import { React } from 'jimu-core'
 import { type JimuMapView } from 'jimu-arcgis'
+import { type IViewOptions } from '../utils/view-options'
 import { applyMapState, captureMapState } from '../utils/map-state'
 import { createViewUrl, decodeViewState, VIEW_PARAMETER } from '../utils/view-state'
 
@@ -9,7 +10,7 @@ interface IMapViews {
   ready: boolean
   message: ViewMessage
   generatedUrl: string
-  apply: (data: string) => Promise<void>
+  apply: (data: string, options?: IViewOptions) => Promise<void>
   capture: () => Promise<void>
 }
 // A map may be shared by several widget instances. Only the most recent request commits.
@@ -24,7 +25,7 @@ export function useMapViews(jmv: JimuMapView | null): IMapViews {
   const operation = React.useRef<number>(0)
   const map = jmv?.view?.map
 
-  const apply = React.useCallback(async (data: string): Promise<void> => {
+  const apply = React.useCallback(async (data: string, options?: IViewOptions): Promise<void> => {
     if (!map || !ready) return
     let state: ReturnType<typeof decodeViewState>
     try { state = decodeViewState(data) } catch { setMessage('invalidView'); return }
@@ -37,7 +38,7 @@ export function useMapViews(jmv: JimuMapView | null): IMapViews {
     setBusy(true)
     setMessage('ready')
     try {
-      if (await applyMapState(map, state, current)) setMessage('applied')
+      if (await applyMapState(map, state, current, options)) setMessage('applied')
     } catch {
       if (current()) setMessage('loadFailed')
     } finally {

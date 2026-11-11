@@ -17,6 +17,8 @@ React, Jimu, ArcGIS und Calcite werden aus der Developer Edition verwendet. Kein
 
 ## Verhalten und Kompatibilität
 
+- Sichtbar ausgewählte Unterlayer aktivieren beim Wiederherstellen alle übergeordneten WebMap-Gruppen, auch bei verschachtelten Gruppen und abweichender Reihenfolge der gespeicherten Einträge. Eine Unterlayer-Auswahl hat Vorrang vor einem gespeicherten `visible: false` der Eltern-Gruppe. Nur explizit ausgewählte Layer öffnen ihre Gruppen. Neue Ansichten speichern die Sichtbarkeit unter Berücksichtigung ausgeblendeter Eltern, damit ein ausgeschalteter Gruppenbaum beim erneuten Öffnen ausgeschaltet bleibt. Die SDK-Gruppenmodi `inherited` und `exclusive` bleiben erhalten: vererbte Gruppen schalten ihre Kinder gemeinsam, exklusive Gruppen erlauben nur einen direkten Unterlayer.
+
 - Neue Ansichtslinks verwenden ein versioniertes JSON-Format (`version: 2`) und UTF-8/Base64url. Vorhandene App-Parameter, insbesondere `id`, sowie der URL-Hash bleiben erhalten.
 - Historische Base64-Links ohne Versionsfeld sowie vollständig eingefügte URLs werden weiterhin gelesen. Bei alten WMTS-Links fehlt die aktive Layer-/Style-Auswahl; diese Information kann nachträglich nicht rekonstruiert werden. Solche Ansichten neu speichern.
 - Vorhandene OGC-Layer werden über ID und Dienst-URL wiederverwendet. Alte Links ohne IDs werden pro Dienst einmal über Typ und URL zugeordnet. Basemaps und Ground-Layer werden nicht erfasst.

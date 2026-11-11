@@ -13,6 +13,40 @@ function operationalLayers(map: __esri.Map): __esri.Layer[] {
     ? [layer, ...layer.layers.toArray().flatMap(visit)] : [layer]
   return map.layers.toArray().flatMap(visit)
 }
+/** Resolve child selections first, then enable ancestors before touching children. */
+function restoreVisibility(map: __esri.Map, desired: Map<string, boolean>): void {
+  const resolve = (layer: __esri.Layer): boolean => {
+    let selected = desired.get(layer.id) === true
+    if (layer instanceof GroupLayer) {
+      for (const child of layer.layers.toArray()) selected = resolve(child) || selected
+      if (selected) desired.set(layer.id, true)
+    }
+    return selected
+  }
+  map.layers.toArray().forEach(resolve)
+  const apply = (layer: __esri.Layer): void => {
+    const visible = desired.get(layer.id)
+    if (visible !== undefined) layer.visible = visible
+    if (layer instanceof GroupLayer) {
+      // inherited/exclusive are SDK constraints, not settings to override here.
+      if (layer.visibilityMode === 'inherited') return
+      const children = layer.layers.toArray()
+      children.filter((child: __esri.Layer): boolean => desired.get(child.id) !== true).forEach(apply)
+      children.filter((child: __esri.Layer): boolean => desired.get(child.id) === true).forEach(apply)
+    }
+  }
+  map.layers.toArray().forEach(apply)
+}
+function effectiveVisibility(map: __esri.Map): Map<string, boolean> {
+  const result = new Map<string, boolean>()
+  const visit = (layer: __esri.Layer, parentVisible: boolean): void => {
+    const visible = parentVisible && layer.visible
+    result.set(layer.id, visible)
+    if (layer instanceof GroupLayer) layer.layers.toArray().forEach((child: __esri.Layer): void => { visit(child, visible) })
+  }
+  map.layers.toArray().forEach((layer: __esri.Layer): void => { visit(layer, true) })
+  return result
+}
 function isOgc(layer: __esri.Layer): layer is OgcLayer {
   return layer instanceof WMSLayer || layer instanceof WMTSLayer
 }
@@ -31,10 +65,11 @@ export async function captureMapState(map: __esri.Map): Promise<IViewState> {
   const layers = operationalLayers(map)
   const services = layers.filter(isOgc)
   await Promise.all(services.map((layer: OgcLayer): Promise<OgcLayer> => layer.load()))
+  const visibility = effectiveVisibility(map)
   return { version: 2,
     internal: layers.filter((layer: __esri.Layer): boolean => !layer.id.startsWith(MANAGED_PREFIX))
-      .map((layer: __esri.Layer): { id: string; visible: boolean } => ({ id: layer.id, visible: layer.visible })),
-    external: services.map(captureService) }
+      .map((layer: __esri.Layer): { id: string; visible: boolean } => ({ id: layer.id, visible: visibility.get(layer.id) ?? false })),
+    external: services.map((layer: OgcLayer): IService => ({ ...captureService(layer), visible: visibility.get(layer.id) ?? false })) }
 }
 function flattenSublayers(layers: __esri.WMSSublayer[]): __esri.WMSSublayer[] {
   return layers.flatMap((layer: __esri.WMSSublayer): __esri.WMSSublayer[] =>
@@ -114,11 +149,11 @@ export async function applyMapState(map: __esri.Map, state: IViewState, isCurren
     map.removeMany(obsolete)
     obsolete.forEach((layer: __esri.Layer): void => { layer.destroy() })
     map.addMany(prepared.filter((item: IPreparedLayer): boolean => item.created).map((item: IPreparedLayer): OgcLayer => item.layer))
-    const layersById = new Map(operationalLayers(map).map((layer: __esri.Layer): [string, __esri.Layer] => [layer.id, layer]))
+    const desired = new Map(prepared.map((item: IPreparedLayer): [string, boolean] => [item.layer.id, item.state.visible]))
     state.internal.forEach((visibility: { id: string; visible: boolean }): void => {
-      const layer = layersById.get(visibility.id)
-      if (layer) layer.visible = visibility.visible
+      desired.set(visibility.id, visibility.visible)
     })
+    restoreVisibility(map, desired)
     return true
   } finally {
     prepared.forEach((item: IPreparedLayer): void => {

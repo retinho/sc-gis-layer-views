@@ -12,6 +12,7 @@ import { getLeafKeys } from '../layer-selection'
 import { ExternalEditor } from './external-editor'
 import { isValidExternalLayer } from '../../shared/external-config'
 import type { ILayerNode } from '../layer-selection'
+import { WebMapReconcile } from './webmap-reconcile'
 import { LayerTree } from './layer-tree'
 
 interface IThemeEditorProps {
@@ -90,6 +91,7 @@ export function ThemeEditor({ theme, sources, translate, onApply, onCancel }: IT
           </div> : <div className="layer-section">
             {tree.nodes.length === 0 && <p>{translate('noLayers')}</p>}
             {(draft.selectedLayerKeys ?? []).some((key) => !available.has(key)) && <p role="status">{translate('missingLayers')}</p>}
+            <WebMapReconcile theme={draft} nodes={tree.nodes} translate={translate} onChange={setDraft} />
             <LayerTree nodes={tree.nodes} selected={draft.selectedLayerKeys ?? []}
               expandLabel={translate('expandGroup')} collapseLabel={translate('collapseGroup')} onChange={changeSelection} />
           </div>)}
@@ -119,6 +121,7 @@ const editorStyles = css`
   h3 { font-size: 18px; margin: 20px 0 8px; }
   calcite-label { color: inherit; --calcite-label-text-color: currentColor; }
   calcite-button[kind="neutral"] { color: inherit; --calcite-button-text-color: currentColor; --calcite-button-border-color: currentColor; --calcite-button-background-color: transparent; }
+  .reference-issue { border: 1px solid currentColor; padding: 12px; margin: 12px 0; overflow-wrap: anywhere; }
   .external-entry { border: 1px solid currentColor; padding: 16px; margin: 16px 0; }
   .external-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
   .external-fields > * { min-width: 0; }

@@ -58,5 +58,16 @@ System.register([], function (_export) { return { execute: function () { _export
   "externalHelp": "Ajoutez une entrée par couche. Les entrées ayant la même position suivent cet ordre. WMTS exige une grille correspondant au système de coordonnées de la carte.",
   "addService": "Ajouter une couche de service",
   "invalidServices": "Complétez les services et choisissez un groupe et une position existants avant d’appliquer.",
-  "requester": "Demandeur / e-mail (facultatif)"
+  "requester": "Demandeur / e-mail (facultatif)",
+  "webMapReconcile": "Rapprochement WebMap",
+  "reconcileHelp": "Rechargez la structure pour comparer les références enregistrées. Les modifications restent dans le brouillon jusqu’à Appliquer. Les nouvelles couches ne sont pas sélectionnées automatiquement.",
+  "referencesValid": "Toutes les références enregistrées existent dans la structure actuelle.",
+  "referenceMoved": "Identifiant correspondant trouvé à un nouveau chemin :",
+  "referenceAmbiguous": "Plusieurs identifiants correspondent. Choisissez le remplacement manuellement.",
+  "referenceMissing": "Aucun identifiant correspondant. Choisissez un remplacement ou supprimez la référence.",
+  "acceptMoved": "Accepter le nouveau chemin",
+  "assignReference": "Affecter un remplacement",
+  "removeReference": "Retirer du thème",
+  "moveToRootBottom": "Placer le service en bas de la racine",
+  "moveToBottom": "Placer le service en bas du niveau"
 }); } }; });

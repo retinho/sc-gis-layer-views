@@ -58,5 +58,16 @@ System.register([], function (_export) { return { execute: function () { _export
   "externalHelp": "Pro Dienst-Layer einen Eintrag hinzufügen. Einträge mit derselben Position erscheinen in dieser Reihenfolge. WMTS benötigt ein Kachelraster im Koordinatensystem der Karte.",
   "addService": "Dienst-Layer hinzufügen",
   "invalidServices": "Alle Dienste vervollständigen und eine vorhandene Zielgruppe und Position wählen, bevor die Änderungen übernommen werden.",
-  "requester": "Besteller / E-Mail (optional)"
+  "requester": "Besteller / E-Mail (optional)",
+  "webMapReconcile": "WebMap-Abgleich",
+  "reconcileHelp": "Layerstruktur neu laden, um gespeicherte Referenzen abzugleichen. Änderungen bleiben bis zum Übernehmen im Entwurf. Neue Layer werden nicht automatisch ausgewählt.",
+  "referencesValid": "Alle gespeicherten Referenzen sind in der aktuellen Struktur vorhanden.",
+  "referenceMoved": "Passende ID an einem neuen Pfad gefunden:",
+  "referenceAmbiguous": "Mehrere passende IDs gefunden. Ersatz bitte manuell zuordnen.",
+  "referenceMissing": "Keine passende ID gefunden. Ersatz zuordnen oder Referenz bereinigen.",
+  "acceptMoved": "Neuen Pfad übernehmen",
+  "assignReference": "Ersatz zuordnen",
+  "removeReference": "Aus Thema entfernen",
+  "moveToRootBottom": "Dienst auf Hauptebene ganz unten platzieren",
+  "moveToBottom": "Dienst innerhalb der Ebene ganz unten platzieren"
 }); } }; });

@@ -2,7 +2,7 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.6.2 — Externe WMS-/WMTS-Dienste pro Thema
+## Stand 0.7.0 — Externe WMS-/WMTS-Dienste pro Thema
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
 „Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Zusätzliche WMS-/WMTS-Layer werden pro Thema konfiguriert, beim Anzeigen eingefügt und bei Themenwechsel oder Reset vollständig entfernt.
@@ -21,7 +21,7 @@ Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus e
 
 Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.6.2 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
+Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.7.0 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
 
 ## Branches
 
@@ -137,10 +137,26 @@ Nach dem Aktualisieren und Kompilieren bitte dasselbe Thema erneut anzeigen und 
 
 ## Besteller und Speicherung (0.6.2)
 
-Der Themendialog enthält ein optionales gemeinsames Textfeld „Besteller / E-Mail“, beispielsweise `Vorname Nachname, name@organisation.ch`. Übernehmen speichert es mit dem Themenentwurf; Abbrechen verwirft die Bearbeitung. Duplizieren übernimmt den Eintrag. Bestehende Themen bleiben kompatibel. Die Themenkarten zeigen das Feld nicht an.
+Der Themendialog enthält ein optionales gemeinsames Textfeld „Besteller / E-Mail“, beispielsweise `Vorname Nachname, name@organisation.ch`. Übernehmen speichert es mit dem Themenentwurf; Abbrechen verwirft die Bearbeitung. Duplizieren übernimmt den Eintrag. Bestehende Themen bleiben kompatibel. Die Themenkarten zeigen den Eintrag beim Darüberfahren als „Eigentümer: …“ an.
 
 Alle Themen stehen in der Experience-Konfiguration unter `widgets[widgetId].config.themes`. Die Datei `config.json` im Widget-Quellordner enthält nur die Ausgangskonfiguration. Individuelle Einstellungen werden über Esris `onSettingChange` an den Builder übergeben; danach die Experience speichern und für die Benutzer veröffentlichen. Im Portal gehören sie zum Experience-Item, bei Developer-Edition-Apps zu deren App-Konfigurationsdateien unter `server/public/apps/<appId>/`. Sie werden weder ins GitHub-Repository noch in die WebMap zurückgeschrieben.
 
-Die Konfiguration wird mit der Experience geladen. Für Themenmetadaten ist dieser native Weg schlank und benötigt keine zusätzliche Datenbankabfrage. Karten- und Dienstladezeiten sind davon getrennt; insbesondere lädt das Widget beim Aktivieren die externen Dienste neu. Das Kontaktfeld wird zwar nur im Konfigurationsdialog angezeigt, ist als Teil der ausgelieferten App-Konfiguration technisch für berechtigte App-Benutzer einsehbar.
+Die Konfiguration wird mit der Experience geladen. Für Themenmetadaten ist dieser native Weg schlank und benötigt keine zusätzliche Datenbankabfrage. Karten- und Dienstladezeiten sind davon getrennt; insbesondere lädt das Widget beim Aktivieren die externen Dienste neu. Das Kontaktfeld ist im Dialog und als Eigentümerhinweis der Themenkarte sichtbar; es gehört zur ausgelieferten App-Konfiguration.
 
 Vom Nutzer bestätigt: WMS-Aktivierung mit 0.6.1 funktioniert.
+
+## WebMap-Abgleich und Eigentümerhinweis (0.7.0)
+
+Nach einer WebMap-Änderung im Themendialog „Layerstruktur neu laden“ wählen. Der Abschnitt „WebMap-Abgleich“ prüft gespeicherte Layerauswahlen sowie Zielgruppen und Positionsreferenzen externer Dienste gegen diese Struktur.
+
+- Eindeutige gleiche Layer-ID an einem anderen Pfad: Der neue Pfad wird mit seinem aktuellen Namen angeboten. „Neuen Pfad übernehmen“ übernimmt ihn in den Entwurf.
+- Mehrere Treffer oder keine passende ID: Ersatz aus der aktuellen Struktur manuell wählen und zuordnen. Alternativ „Aus Thema entfernen“ entfernt die veraltete Layerauswahl.
+- Bei Sublayern wird die ID zusammen mit der besitzenden Service-Layer-ID verglichen. Identische Sublayer-IDs verschiedener Dienste werden nicht verwechselt. Namen allein sind kein Zuordnungskriterium.
+- Externe Dienste: Erst die Zielgruppe korrigieren, danach eine gegebenenfalls veraltete Positionsreferenz. Explizite Bereinigungsaktionen platzieren den Dienst auf der Hauptebene ganz unten beziehungsweise innerhalb der gewählten Ebene ganz unten. Der Dienst selbst bleibt erhalten.
+- „Abbrechen“ verwirft alle Änderungen; „Übernehmen“ überträgt sie in die Builder-Konfiguration. Danach die Experience speichern und veröffentlichen.
+
+Es werden nur gespeicherte Referenzen geprüft. Neue, bisher nicht ausgewählte Layer erscheinen im normalen Layerbaum und werden nicht automatisch in Themen aufgenommen. Ein historischer vollständiger WebMap-Strukturvergleich wird nicht gespeichert. Ein mit derselben ID ersetzter Dienst lässt sich anhand dieser Referenzen nicht als fachlich neuer Inhalt erkennen. Der Abgleich ist daher eine kontrollierte Zuordnungshilfe, keine automatische fachliche Freigabe.
+
+Beim Darüberfahren über eine Themenkarte erscheint der Browserhinweis „Eigentümer: …“ mit dem hinterlegten Bestellertext. Bei leerem Feld wird kein Hinweis ausgegeben. Die Bezeichnung ist auf Deutsch, Französisch und Englisch übersetzt.
+
+Abnahme: Layer in der WebMap in eine andere Gruppe verschieben, weiteren ausgewählten Layer entfernen, Dialogstruktur neu laden, Zuordnung/Bereinigung durchführen und zunächst abbrechen; danach erneut öffnen und die Änderungen übernehmen. Anzeigen sowie Reset prüfen. Auch verschobene externe Zielgruppen testen. Eigentümerhinweis mit ausgefülltem und leerem Feld prüfen. Lokale Regressionen und Syntaxprüfung bestanden; vollständiger Build und UI-Abnahme erfolgen in ExB 1.17.

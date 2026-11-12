@@ -23,5 +23,6 @@ System.register([], function (_export) { return { execute: function () { _export
   "externalTarget": "Eine konfigurierte Zielgruppe oder Position existiert nicht mehr.",
   "externalLoadError": "Ein Dienst des Themas konnte nicht geladen werden. Das bisherige Thema bleibt erhalten.",
   "externalPrepareError": "Der Dienst wurde geladen, aber sein gewählter Layer konnte nicht vorbereitet werden. Das bisherige Thema bleibt erhalten.",
-  "externalApplyError": "Die Dienst-Layer konnten nicht in der Karte angewendet werden. Das bisherige Thema wurde wiederhergestellt."
+  "externalApplyError": "Die Dienst-Layer konnten nicht in der Karte angewendet werden. Das bisherige Thema wurde wiederhergestellt.",
+  "owner": "Eigentümer"
 }); } }; });

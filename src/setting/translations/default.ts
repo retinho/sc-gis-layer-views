@@ -58,5 +58,16 @@ export default {
   "externalHelp": "Add one entry per service layer. Entries sharing a position appear in this order. WMTS requires a tile matrix set matching the map coordinate system.",
   "addService": "Add service layer",
   "invalidServices": "Complete each service and choose an existing target group and position before applying.",
-  "requester": "Requested by / email (optional)"
+  "requester": "Requested by / email (optional)",
+  "webMapReconcile": "WebMap reconciliation",
+  "reconcileHelp": "Reload the layer structure to compare saved references. Changes remain in this draft until Apply. New layers are not selected automatically.",
+  "referencesValid": "All saved references exist in the current structure.",
+  "referenceMoved": "Matching ID found at a new path:",
+  "referenceAmbiguous": "Several matching IDs found. Choose the replacement manually.",
+  "referenceMissing": "No matching ID found. Choose a replacement or remove the reference.",
+  "acceptMoved": "Accept new path",
+  "assignReference": "Assign replacement",
+  "removeReference": "Remove from theme",
+  "moveToRootBottom": "Place service at root bottom",
+  "moveToBottom": "Place service at group bottom"
 }

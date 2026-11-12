@@ -23,5 +23,6 @@ export default {
   "externalTarget": "A configured target group or position no longer exists.",
   "externalLoadError": "A theme service could not be loaded. The previous theme was retained.",
   "externalPrepareError": "The service loaded, but its selected layer could not be prepared. The previous theme was retained.",
-  "externalApplyError": "The service layers could not be applied to the map. The previous theme was restored."
+  "externalApplyError": "The service layers could not be applied to the map. The previous theme was restored.",
+  "owner": "Owner"
 }

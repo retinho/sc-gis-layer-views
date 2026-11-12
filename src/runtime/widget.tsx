@@ -44,7 +44,7 @@ export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElem
       {themes.length === 0 ? <p>{translate('empty')}</p> : (
         <ul className="theme-list">
           {themes.map((theme) => (
-            <li key={theme.id} className="theme-card">
+            <li key={theme.id} className="theme-card" title={theme.requester?.trim() ? `${translate('owner')}: ${theme.requester.trim()}` : undefined}>
               <Row className="align-items-center m-0">
                 <Col className="theme-name p-0">{theme.name}</Col>
                 <Col xs="auto" className="p-0">

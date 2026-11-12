@@ -2,7 +2,7 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.8.1 — Externe WMS-/WMTS-Dienste pro Thema
+## Stand 0.8.3 — Externe WMS-/WMTS-Dienste pro Thema
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
 „Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Zusätzliche WMS-/WMTS-Layer werden pro Thema konfiguriert, beim Anzeigen eingefügt und bei Themenwechsel oder Reset vollständig entfernt.
@@ -21,7 +21,7 @@ Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus e
 
 Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.8.1 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
+Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.8.3 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
 
 ## Branches
 
@@ -207,3 +207,11 @@ Abnahme: Thema speichern/veröffentlichen, URL-Zusatz kopieren und an die Experi
 Der Erweiterungspunkt im Manifest ist auf den Esri-Wert `APP_CONFIG_PROCESSOR` korrigiert. In 0.8.0/0.8.1 verhinderte der falsche Wert die Registrierung; das URL-Thema startete erst beim Öffnen des Panels.
 
 Beim Update den vollständigen Widget-Ordner inklusive `manifest.json` ersetzen, den ExB-Client neu starten und neu kompilieren. Die Experience danach speichern/veröffentlichen und im Browser vollständig neu laden. Mit `?thema=<ID>` und geschlossenem Themenpanel testen; die normale Layer-Liste kann geöffnet bleiben. Bei bereitgestelltem Widget auch dort den vollständigen Build ersetzen. Admin-Versionsanzeige: 0.8.2. Development-Teststand, keine Produktionsfreigabe.
+
+## Hintergrundstart auf separatem Widget-Webserver (0.8.3)
+
+0.8.2 startet laut Portal-Abnahme weiterhin erst beim Öffnen des Panels. Zwei Lücken im bisherigen Startpfad wurden korrigiert: `properties.notShareDynamicModules: true` hält dynamische Module im eigenen Widget-Ordner (statt im gemeinsamen `widgets/chunks`); vor dem Import der SDK-abhängigen Laufzeit wird die SDK-Bereitschaft über `loadArcGISJSAPIModules` hergestellt. Der Vorgang blockiert das Verarbeiten der App-Konfiguration nicht. Fehler werden mit `[sc-gis-layer-views] URL theme background startup failed` in der Browserkonsole ausgegeben.
+
+Quelle: [Esri WidgetManifestProperties](https://developers.arcgis.com/experience-builder/api-reference/jimu-core/WidgetManifestProperties/) und SDK-Loader im offiziellen ExB-1.17-Beispiel `widgets/add-layers`. Regressionen prüfen private Chunks sowie Reihenfolge und Fehlerweitergabe beim Start. Ohne Zugriff auf den ausgelieferten Build und die Portal-Konsole ist die konkrete verbleibende Fehlerursache nicht abschliessend nachgewiesen.
+
+Deployment: vollständigen Produktionsbuild des Widgets einschliesslich `chunks`, `extensions` und Manifest auf den Widget-Webserver übertragen. Experience speichern/veröffentlichen, Browsercache umgehen und URL-Thema bei geschlossenem Themenpanel prüfen. Falls es weiterhin nicht startet: Browserkonsole und Netzwerkfehler vor dem Öffnen des Panels prüfen (fehlendes Erweiterungsmodul, fehlender Chunk, SDK-Fehler). Vollständiger ExB-Build und Portal-Laufzeitabnahme stehen aus. Keine Produktionsfreigabe.

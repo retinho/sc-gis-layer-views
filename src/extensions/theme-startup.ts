@@ -1,4 +1,6 @@
 import type { extensionSpec, AppConfig } from 'jimu-core'
+import { loadArcGISJSAPIModules } from 'jimu-arcgis'
+import { bootThemeStartup } from './boot-theme-startup'
 import type { IConfig } from '../config'
 import { readThemeRequest, findThemeOwners } from '../shared/theme-link'
 
@@ -16,14 +18,15 @@ export default class ThemeStartup implements extensionSpec.AppConfigProcessorExt
     const mapWidgetId = widget?.useMapWidgetIds?.[0]
     if (!mapWidgetId) return appConfig
     const theme = (widget.config as IConfig)?.themes?.find((entry) => entry.id === request.themeId)
-    // The module is loaded by the framework; no map loading is awaited in config processing.
-    try {
-      const { startUrlTheme } = await import('../runtime/url-startup')
-      startUrlTheme(this.widgetId, mapWidgetId, theme)
-    } catch {
-      // A failed extension load must not prevent the Experience from opening.
-      // The widget retries the URL request when its panel is opened.
-    }
+    // Do not hold app configuration processing until the SDK or map is ready.
+    // The extension runs before widget dependencies have necessarily loaded.
+    void bootThemeStartup(
+      () => loadArcGISJSAPIModules(['esri/WebMap']),
+      () => import('../runtime/url-startup'),
+      (runtime) => runtime.startUrlTheme(this.widgetId, mapWidgetId, theme)
+    ).catch((error: unknown) => {
+      console.error('[sc-gis-layer-views] URL theme background startup failed', error)
+    })
     return appConfig
   }
 }

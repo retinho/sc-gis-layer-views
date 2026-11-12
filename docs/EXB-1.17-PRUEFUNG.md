@@ -83,3 +83,11 @@ Controller-/Beobachter-Regressionen und Syntaxprüfung bestanden. Die isolierte 
 ## Nachprüfung 0.8.2: Registrierung des Hintergrundstarts
 
 Direkter Vergleich mit [translation/manifest.json im ExB-1.17-Referenzcommit](https://github.com/Esri/arcgis-experience-builder-sdk-resources/blob/16ccec0c21cfff1cb66e283eacaafc326ed6b95c/widgets/translation/manifest.json) ergab einen falschen Extension-Point-Wert in 0.8.0/0.8.1. Die frühere Aussage zur Übereinstimmung war falsch und wurde oben korrigiert. Richtig ist `APP_CONFIG_PROCESSOR`; `AppConfigProcessorExtension` ist der TypeScript-Interfacename, nicht der Manifestwert. Manifest korrigiert und Regression ergänzt. Die bisherigen isolierten Logiktests konnten diesen Registrierungsfehler nicht erkennen. Vollständige Laufzeitabnahme in ExB bleibt erforderlich.
+
+## Hintergrundstart auf separatem Widget-Webserver (0.8.3)
+
+0.8.2 startet laut Portal-Abnahme weiterhin erst beim Öffnen des Panels. Zwei Lücken im bisherigen Startpfad wurden korrigiert: `properties.notShareDynamicModules: true` hält dynamische Module im eigenen Widget-Ordner (statt im gemeinsamen `widgets/chunks`); vor dem Import der SDK-abhängigen Laufzeit wird die SDK-Bereitschaft über `loadArcGISJSAPIModules` hergestellt. Der Vorgang blockiert das Verarbeiten der App-Konfiguration nicht. Fehler werden mit `[sc-gis-layer-views] URL theme background startup failed` in der Browserkonsole ausgegeben.
+
+Quelle: [Esri WidgetManifestProperties](https://developers.arcgis.com/experience-builder/api-reference/jimu-core/WidgetManifestProperties/) und SDK-Loader im offiziellen ExB-1.17-Beispiel `widgets/add-layers`. Regressionen prüfen private Chunks sowie Reihenfolge und Fehlerweitergabe beim Start. Ohne Zugriff auf den ausgelieferten Build und die Portal-Konsole ist die konkrete verbleibende Fehlerursache nicht abschliessend nachgewiesen.
+
+Deployment: vollständigen Produktionsbuild des Widgets einschliesslich `chunks`, `extensions` und Manifest auf den Widget-Webserver übertragen. Experience speichern/veröffentlichen, Browsercache umgehen und URL-Thema bei geschlossenem Themenpanel prüfen. Falls es weiterhin nicht startet: Browserkonsole und Netzwerkfehler vor dem Öffnen des Panels prüfen (fehlendes Erweiterungsmodul, fehlender Chunk, SDK-Fehler). Vollständiger ExB-Build und Portal-Laufzeitabnahme stehen aus. Keine Produktionsfreigabe.

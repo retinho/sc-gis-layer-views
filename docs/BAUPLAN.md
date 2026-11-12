@@ -1,6 +1,6 @@
 # Vereinbarter Bauplan und Abnahmestand
 
-Stand: 0.8.2 auf development, 12. November 2026. Ziel: Experience Builder Developer Edition 1.17, ArcGIS Enterprise 11.5. Keine Produktionsfreigabe erteilt.
+Stand: 0.8.3 auf development, 12. November 2026. Ziel: Experience Builder Developer Edition 1.17, ArcGIS Enterprise 11.5. Keine Produktionsfreigabe erteilt.
 
 ## Umgesetzte Funktionen
 
@@ -35,7 +35,7 @@ Lokale Regressionen prüfen Sichtbarkeit, Gruppenmodi, Entwürfe, Abgleich, Plat
 
 Vor Freigabe auf dem Zielsystem prüfen:
 
-- 0.8.2 kompilieren; bestehende gespeicherte Experience öffnen, speichern und neu laden.
+- 0.8.3 kompilieren; bestehende gespeicherte Experience öffnen, speichern und neu laden.
 - Eigenen Dienst in eine andere Gruppe/Hauptebene verschieben; Reset und Themenwechsel ohne zurückbleibende Einträge.
 - Nicht benötigten WebMap-Dienst ausfallen lassen: anderes Thema und Reset bleiben nutzbar, Hinweis erscheint. Betroffenes Thema wird ohne Kartenänderung abgewiesen. Nach Wiederherstellung neu laden.
 - Fehlende Referenz im Dialog: Übernehmen gesperrt; Zuordnen/Entfernen löst die Sperre. Bei Ladefehlern keine Bereinigung, erst Struktur erneut laden.
@@ -67,3 +67,11 @@ Die in der README beschriebene Abnahme mit geschlossenem Themenpanel, Portal-Anm
 Der Manifest-Eintrag lautet jetzt `APP_CONFIG_PROCESSOR`, wie im offiziellen ExB-1.17-Beispiel. Der vorherige Wert `APP_CONFIG_PROCESSOR_EXTENSION` registrierte den Hintergrundstart nicht; deshalb wirkte nur der Fallback beim Öffnen des Panels. Eine Regression prüft nun auch den Manifest-Vertrag und das Vorhandensein des Erweiterungsmoduls.
 
 Abnahme nach vollständigem Austausch einschliesslich manifest.json: Client neu starten, Experience speichern/veröffentlichen, Seite vollständig neu laden und mit `?thema=<ID>` bei geschlossenem Themenpanel testen. Standard-Layerliste bleibt geöffnet. Thema muss ohne Öffnen des Themenwidgets aktiv werden. Danach Reset sowie Start ohne Parameter prüfen. Vollständiger ExB-Build und Abnahme durch den Betreiber stehen aus.
+
+## Hintergrundstart auf separatem Widget-Webserver (0.8.3)
+
+0.8.2 startet laut Portal-Abnahme weiterhin erst beim Öffnen des Panels. Zwei Lücken im bisherigen Startpfad wurden korrigiert: `properties.notShareDynamicModules: true` hält dynamische Module im eigenen Widget-Ordner (statt im gemeinsamen `widgets/chunks`); vor dem Import der SDK-abhängigen Laufzeit wird die SDK-Bereitschaft über `loadArcGISJSAPIModules` hergestellt. Der Vorgang blockiert das Verarbeiten der App-Konfiguration nicht. Fehler werden mit `[sc-gis-layer-views] URL theme background startup failed` in der Browserkonsole ausgegeben.
+
+Quelle: [Esri WidgetManifestProperties](https://developers.arcgis.com/experience-builder/api-reference/jimu-core/WidgetManifestProperties/) und SDK-Loader im offiziellen ExB-1.17-Beispiel `widgets/add-layers`. Regressionen prüfen private Chunks sowie Reihenfolge und Fehlerweitergabe beim Start. Ohne Zugriff auf den ausgelieferten Build und die Portal-Konsole ist die konkrete verbleibende Fehlerursache nicht abschliessend nachgewiesen.
+
+Deployment: vollständigen Produktionsbuild des Widgets einschliesslich `chunks`, `extensions` und Manifest auf den Widget-Webserver übertragen. Experience speichern/veröffentlichen, Browsercache umgehen und URL-Thema bei geschlossenem Themenpanel prüfen. Falls es weiterhin nicht startet: Browserkonsole und Netzwerkfehler vor dem Öffnen des Panels prüfen (fehlendes Erweiterungsmodul, fehlender Chunk, SDK-Fehler). Vollständiger ExB-Build und Portal-Laufzeitabnahme stehen aus. Keine Produktionsfreigabe.

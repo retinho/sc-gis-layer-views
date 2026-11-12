@@ -2,7 +2,7 @@
   "name": "sc-gis-layer-views",
   "label": "Layer-Themen",
   "type": "widget",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "exbVersion": "1.17.0",
   "author": "SC-GIS",
   "description": "Vordefinierte Layer-Themen für eine verknüpfte WebMap.",
@@ -19,7 +19,8 @@
     "height": 380
   },
   "properties": {
-    "hasConfig": true
+    "hasConfig": true,
+    "notShareDynamicModules": true
   },
   "settingDependency": [
     "jimu-arcgis"

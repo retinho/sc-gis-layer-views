@@ -10,6 +10,7 @@ import { stripTypeScriptTypes } from 'node:module'
 // Framework registration is required even when the widget panel never mounts.
 // Esri SDK resources 1.17, widgets/translation/manifest.json, commit 16ccec0.
 const manifest = JSON.parse(await readFile(new URL('../manifest.json', import.meta.url), 'utf8'))
+assert.equal(manifest.properties.notShareDynamicModules, true, 'Hosted widget must include its own dynamic chunks')
 assert.deepEqual(manifest.extensions, [{ point: 'APP_CONFIG_PROCESSOR', uri: 'extensions/theme-startup' }])
 await readFile(new URL('../src/' + manifest.extensions[0].uri + '.ts', import.meta.url), 'utf8')
 
@@ -27,6 +28,19 @@ async function load(relative) {
   await writeFile(output, stripped)
   return import(pathToFileURL(output).href)
 }
+const { bootThemeStartup } = await load('../src/extensions/boot-theme-startup.ts')
+let releaseSdk
+const sdkReady = new Promise((resolve) => { releaseSdk = resolve })
+const startupSteps = []
+const startup = bootThemeStartup(() => sdkReady, async () => { startupSteps.push('import'); return 'runtime' }, (runtime) => startupSteps.push(runtime))
+await Promise.resolve()
+assert.deepEqual(startupSteps, [], 'Runtime must not import before SDK readiness')
+releaseSdk()
+await startup
+assert.deepEqual(startupSteps, ['import', 'runtime'])
+await assert.rejects(bootThemeStartup(async () => { throw new Error('SDK unavailable') }, async () => { throw new Error('must not import') }, () => {}), /SDK unavailable/)
+await assert.rejects(bootThemeStartup(async () => {}, async () => { throw new Error('chunk missing') }, () => {}), /chunk missing/)
+
 const { getLeafKeys, getSelectionState, toggleSelection } = await load('../src/setting/layer-selection.ts')
 const { buildLayerTree } = await load('../src/setting/build-layer-tree.ts')
 const leaf = (key) => ({ key, title: 'Same title', children: [], selectable: true })

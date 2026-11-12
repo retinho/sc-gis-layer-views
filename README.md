@@ -1,1 +1,0 @@
-# sc-gis-layer-views

@@ -3,6 +3,8 @@ import { ImmutableObject } from 'jimu-core'
 export interface ILayerTheme {
   id: string
   name: string
+  webMapKey?: string
+  selectedLayerKeys?: readonly string[]
 }
 
 export interface IConfig {

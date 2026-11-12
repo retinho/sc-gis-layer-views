@@ -2,10 +2,10 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.2.1 — Grundgerüst
+## Stand 0.3.0 — Layerauswahl pro Thema
 
-Enthalten: Karten-Widget-Auswahl, Kartenanbindung, lokalisierte Oberfläche, Themenkarten-Komponente und leere Standardkonfiguration.
-Noch nicht enthalten: Layerbaum, Themenaktivierung, Reset und externe Dienste. Anzeigen und Reset sind deshalb bewusst deaktiviert. Es werden keine Kartendaten oder Sichtbarkeiten verändert.
+Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
+Noch nicht enthalten: Themenaktivierung, Reset und externe Dienste. Anzeigen und Reset sind deshalb bewusst deaktiviert. Es werden keine Kartendaten oder Sichtbarkeiten verändert.
 
 ## Herunterladen und installieren
 
@@ -13,7 +13,7 @@ Noch nicht enthalten: Layerbaum, Themenaktivierung, Reset und externe Dienste. A
 2. ZIP entpacken; den Ordner `sc-gis-layer-views-development` in `sc-gis-layer-views` umbenennen.
 3. Diesen Ordner unter `client/your-extensions/widgets/sc-gis-layer-views/` der bestehenden ExB-1.17-Installation ablegen. `manifest.json` muss direkt darin liegen, ohne zusätzliche Ordnerebene.
 4. Die Developer Edition nach deren Installationsanleitung starten/neustarten. Das Widget „Layer-Themen“ hinzufügen und in seinen Einstellungen ein vorhandenes Karten-Widget auswählen.
-5. Themen lassen sich jetzt direkt in den Widget-Einstellungen erstellen, benennen, duplizieren, sortieren und entfernen. Die Experience anschliessend speichern. Die Startkonfiguration enthält keine Beispielthemen. Für eine reine Layout-Vorschau können vor dem Hinzufügen des Widgets in `config.json` Themenobjekte mit `id` und `name` eingetragen werden; dies schaltet noch keine Layer.
+5. Themen in den Widget-Einstellungen erstellen, benennen und die gewünschten Layer auswählen. Gruppen mit dem Pfeil öffnen. Die Gruppen-Checkbox wählt alle Kinder aus. Themen lassen sich duplizieren, sortieren und entfernen. Die Experience anschliessend speichern.
 
 ## Kompilieren und bereitstellen
 
@@ -21,7 +21,7 @@ Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus e
 
 Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Dieser erste Zwischenstand ist **nicht produktionsreif**. Ein Build und eine visuelle Abnahme in ExB 1.17 stehen aus; lokal ist kein ExB-SDK installiert.
+Dieser Zwischenstand ist **nicht produktionsreif**. Build und visuelle Abnahme von 0.3.0 in ExB 1.17 stehen aus; lokal ist kein vollständiges ExB-SDK installiert. Die Vorgängerversion 0.2.1 wurde vom Nutzer als funktionierend bestätigt.
 
 ## Branches
 
@@ -43,10 +43,28 @@ Namen und Reihenfolge werden in der Widget-Konfiguration gespeichert und direkt 
 
 Abnahme: Mehrere Themen anlegen und umbenennen, mittleres Thema duplizieren und entfernen, erste/letzte Position sortieren, Experience speichern und neu laden. Einstellungen und Themenkarten muessen uebereinstimmen. Anzeigen und Reset bleiben deaktiviert; die Karte wird nicht veraendert.
 
-Das Grundgeruest 0.1.1 wurde vom Nutzer in ExB ohne sichtbare Fehler bestaetigt. Fuer 0.2.0 steht der Build in ExB 1.17 noch aus.
+Das Grundgerüst 0.1.1 und die Themenverwaltung wurden vom Nutzer in ExB als funktionierend bestätigt.
 
 ## Korrektur 0.2.1
 
 Die neutralen Verwaltungsbuttons und das Label des Themennamens erben jetzt die Textfarbe des Builder-Einstellungsbereichs. Dadurch verwenden sie im dunklen Builder nicht mehr die dunkle Calcite-Standardtextfarbe. Deaktivierte Sortierbuttons bleiben deaktiviert und werden weiterhin von Calcite abgeschwaecht. Die rote Loeschen-Aktion bleibt erhalten.
 
-Vom Nutzer bestaetigt: Themenverwaltung 0.2.0 funktioniert; Kontrastfehler im dunklen Builder gemeldet. 0.2.1 lokal auf JSON und Diff geprueft; visuelle Abnahme in ExB steht aus.
+Vom Nutzer bestätigt: Die Kontrastkorrektur 0.2.1 funktioniert.
+
+## Layerbaum 0.3.0
+
+- Grundlage ist die gespeicherte WebMap des aktiven verknüpften Karten-Widgets. Zum Lesen wird eine separate WebMap ohne eigene MapView geladen. Die laufende Karte bleibt unverändert.
+- WebMap-Gruppen, Untergruppen und MapImageLayer-Unterlayer werden aufgelöst. Andere operative Layer werden als ganze Layer angeboten; Basemap und Tabellen sind nicht Teil der Themenauswahl.
+- Jede Auswahl speichert Portal/WebMap-ID und vollständige Layer-ID-Pfade, nicht den angezeigten Namen. Gleiche Namen und gleiche Unterlayer-IDs in verschiedenen Diensten bleiben unterscheidbar.
+- Duplizieren kopiert auch die Layerauswahl. Bestehende Themen ohne Auswahl bleiben kompatibel.
+- Ein Kartenwechsel übernimmt keine Auswahl stillschweigend in eine andere WebMap. Der Admin kann ein betroffenes Thema ausdrücklich auf die aktuelle WebMap umstellen; dabei wird seine alte Auswahl geleert.
+- „Layerstruktur neu laden“ liest nach gespeicherten Änderungen an der WebMap erneut. Ladefehler und fehlende Layer überschreiben keine gespeicherten Verweise.
+- Bei nicht erreichbaren Ressourcen kann die WebMap-Ladung fehlschlagen. Zugriff prüfen und erneut laden. Die aktive Karte muss im Builder verfügbar sein.
+
+### Prüfung
+
+Lokale Syntaxprüfung aller TS-/TSX-Dateien und Tests der Auswahl-/Baumlogik erfolgreich. Der Adapter wurde anhand der von Esri veröffentlichten [Maps-SDK-4.32-Typdefinitionen](https://unpkg.com/@arcgis/core@4.32/interfaces.d.ts) geprüft. Die neue Settings-Abhängigkeit `jimu-arcgis` ist im Manifest eingetragen.
+
+Die unabhängigen Logiktests lassen sich mit Node.js ab 22.13 ausführen: `node tests/layer-selection.mjs`. Sie prüfen verschachtelte Gruppen, Teil-Auswahl, Abwählen, leere Gruppen, stabile IDs, Reihenfolge, unveränderte Eingabedaten und das Beibehalten fehlender gespeicherter Verweise. Das ersetzt keinen ExB-SDK-Build.
+
+In ExB prüfen: Gruppe wählen, Untergruppe öffnen, ein Kind abwählen, Teil-Markierung der Eltern kontrollieren; Thema duplizieren; Experience speichern und erneut öffnen. Anschliessend Kartenwechsel, „Layerstruktur neu laden“ sowie dunklen Builder prüfen. Die Karte und ihr Zoom dürfen sich dabei nicht verändern.

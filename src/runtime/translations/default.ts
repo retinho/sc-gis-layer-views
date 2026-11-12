@@ -7,5 +7,5 @@ export default {
   "noMap": "Please select a map in the widget settings.",
   "waitingMap": "Waiting for the connected map.",
   "empty": "No themes configured yet.",
-  "foundation": "Layer selection, activation and reset will follow in the next steps."
+  "foundation": "Theme activation and reset will follow in the next steps."
 }

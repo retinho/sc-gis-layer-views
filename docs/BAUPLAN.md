@@ -19,8 +19,8 @@ Ziel: Experience Builder Developer Edition 1.17, ArcGIS Enterprise 11.5.
 
 ## Ausbauschritte
 
-1. Grundgerüst, Kartenbindung, Übersetzungen und Themenkarten (aktueller Stand).
-2. Admin-Themenverwaltung und rekursiver Layerbaum.
+1. Grundgerüst, Kartenbindung, Übersetzungen und Themenkarten (umgesetzt und vom Nutzer in ExB bestätigt).
+2. Admin-Themenverwaltung (bestätigt) und rekursiver Layerbaum (Stand 0.3.0, ExB-Abnahme ausstehend).
 3. Themenaktivierung und Reset anhand gespeicherter WebMap, ohne Kameraänderungen.
 4. Externe WMS-/WMTS-Dienste und Positionierung.
 5. Abnahme in ExB 1.17 inklusive Standard-Layerliste, Gruppen, Dark Mode, MN95 und Portal.

@@ -7,8 +7,8 @@ export default {
   "noMap": "Please select a map in the widget settings.",
   "waitingMap": "Waiting for the connected map.",
   "empty": "No themes configured yet.",
-  "foundation": "Layer selection, activation and reset will follow in the next steps.",
-  "managementHelp": "Create themes and arrange the theme cards. Layer selection follows in the next step.",
+  "foundation": "Theme activation and reset will follow in the next steps.",
+  "managementHelp": "Create themes and arrange their order.",
   "newTheme": "New theme",
   "addTheme": "Add theme",
   "themeName": "Theme name",
@@ -16,5 +16,16 @@ export default {
   "duplicate": "Duplicate",
   "moveUp": "Move up",
   "moveDown": "Move down",
-  "deleteTheme": "Delete"
+  "deleteTheme": "Delete",
+  "layerHelp": "Select layers for each theme. Selecting a group selects all its children; individual layers can then be deselected. The map is not changed yet.",
+  "loadingLayers": "Loading saved WebMap layers",
+  "layerLoadError": "The WebMap or a layer could not be loaded. Check access and try again. Saved selections are retained.",
+  "reloadLayers": "Reload layer structure",
+  "webMapOnly": "Select a map widget with a saved 2D WebMap.",
+  "noLayers": "The WebMap has no operational layers.",
+  "differentMap": "This theme belongs to another WebMap. Its selection is retained. Use the button below to replace it with an empty selection for this map.",
+  "useCurrentMap": "Use current WebMap and clear selection",
+  "missingLayers": "Some saved layers are no longer in this WebMap. Their references are retained.",
+  "expandGroup": "Expand group",
+  "collapseGroup": "Collapse group"
 }

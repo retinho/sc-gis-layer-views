@@ -7,8 +7,8 @@ System.register([], function (_export) { return { execute: function () { _export
   "noMap": "Bitte Karte in den Widget-Einstellungen wählen.",
   "waitingMap": "Warten auf die verknüpfte Karte.",
   "empty": "Noch keine Themen konfiguriert.",
-  "foundation": "Layerauswahl, Aktivierung und Reset folgen in den nächsten Schritten.",
-  "managementHelp": "Themen erstellen und die Reihenfolge festlegen. Die Layerauswahl folgt im nächsten Schritt.",
+  "foundation": "Themenaktivierung und Reset folgen in den nächsten Schritten.",
+  "managementHelp": "Themen erstellen und ihre Reihenfolge festlegen.",
   "newTheme": "Neues Thema",
   "addTheme": "Thema hinzufügen",
   "themeName": "Themenname",
@@ -16,5 +16,16 @@ System.register([], function (_export) { return { execute: function () { _export
   "duplicate": "Duplizieren",
   "moveUp": "Nach oben",
   "moveDown": "Nach unten",
-  "deleteTheme": "Löschen"
+  "deleteTheme": "Löschen",
+  "layerHelp": "Layer pro Thema auswählen. Eine Gruppe wählt alle enthaltenen Layer aus; einzelne Layer können danach abgewählt werden. Die Karte wird noch nicht verändert.",
+  "loadingLayers": "Layer der gespeicherten WebMap werden geladen",
+  "layerLoadError": "Die WebMap oder ein Layer konnte nicht geladen werden. Zugriff prüfen und erneut versuchen. Gespeicherte Auswahlen bleiben erhalten.",
+  "reloadLayers": "Layerstruktur neu laden",
+  "webMapOnly": "Bitte ein Karten-Widget mit einer gespeicherten 2D-WebMap wählen.",
+  "noLayers": "Die WebMap enthält keine operativen Layer.",
+  "differentMap": "Dieses Thema gehört zu einer anderen WebMap. Seine Auswahl bleibt erhalten. Mit dem folgenden Knopf wird sie durch eine leere Auswahl für diese Karte ersetzt.",
+  "useCurrentMap": "Aktuelle WebMap verwenden und Auswahl leeren",
+  "missingLayers": "Einige gespeicherte Layer fehlen in dieser WebMap. Ihre Verweise bleiben erhalten.",
+  "expandGroup": "Gruppe aufklappen",
+  "collapseGroup": "Gruppe zuklappen"
 }); } }; });

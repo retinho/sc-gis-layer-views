@@ -7,8 +7,8 @@ System.register([], function (_export) { return { execute: function () { _export
   "noMap": "Veuillez choisir une carte dans les paramètres du widget.",
   "waitingMap": "En attente de la carte associée.",
   "empty": "Aucun thème configuré.",
-  "foundation": "La sélection des couches, l’activation et la réinitialisation suivront.",
-  "managementHelp": "Créez des thèmes et définissez leur ordre. La sélection des couches suivra.",
+  "foundation": "L’activation des thèmes et la réinitialisation suivront.",
+  "managementHelp": "Créez des thèmes et définissez leur ordre.",
   "newTheme": "Nouveau thème",
   "addTheme": "Ajouter un thème",
   "themeName": "Nom du thème",
@@ -16,5 +16,16 @@ System.register([], function (_export) { return { execute: function () { _export
   "duplicate": "Dupliquer",
   "moveUp": "Monter",
   "moveDown": "Descendre",
-  "deleteTheme": "Supprimer"
+  "deleteTheme": "Supprimer",
+  "layerHelp": "Sélectionnez les couches par thème. Un groupe sélectionne tous ses enfants ; les couches peuvent ensuite être décochées. La carte reste inchangée.",
+  "loadingLayers": "Chargement des couches de la WebMap enregistrée",
+  "layerLoadError": "La WebMap ou une couche n’a pas pu être chargée. Vérifiez les accès et réessayez. Les sélections sont conservées.",
+  "reloadLayers": "Recharger la structure",
+  "webMapOnly": "Choisissez un widget Carte avec une WebMap 2D enregistrée.",
+  "noLayers": "La WebMap ne contient aucune couche opérationnelle.",
+  "differentMap": "Ce thème appartient à une autre WebMap. Sa sélection est conservée. Le bouton suivant la remplace par une sélection vide pour cette carte.",
+  "useCurrentMap": "Utiliser cette WebMap et vider la sélection",
+  "missingLayers": "Certaines couches enregistrées ne figurent plus dans cette WebMap. Leurs références sont conservées.",
+  "expandGroup": "Développer le groupe",
+  "collapseGroup": "Réduire le groupe"
 }); } }; });

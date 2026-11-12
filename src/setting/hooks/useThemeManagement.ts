@@ -9,10 +9,13 @@ interface IThemeManagement {
   duplicate: (id: string, suffix: string) => void
   remove: (id: string) => void
   move: (id: string, offset: -1 | 1) => void
+  selectLayers: (id: string, webMapKey: string, keys: readonly string[]) => void
 }
 
 export function useThemeManagement(props: AllWidgetSettingProps<IMConfig>): IThemeManagement {
-  const themes: ILayerTheme[] = Array.from(props.config?.themes ?? [], (theme) => ({ ...theme }))
+  const themes: ILayerTheme[] = Array.from(props.config?.themes ?? [], (theme) => ({
+    ...theme, selectedLayerKeys: Array.from(theme.selectedLayerKeys ?? [])
+  }))
   const save = (next: ILayerTheme[]): void => {
     const config = props.config ?? Immutable<IConfig>({ themes: [] })
     props.onSettingChange({ id: props.id, config: config.set('themes', next) })
@@ -28,6 +31,11 @@ export function useThemeManagement(props: AllWidgetSettingProps<IMConfig>): IThe
   }
   return {
     themes,
+    selectLayers: (id: string, webMapKey: string, keys: readonly string[]): void => {
+      save(themes.map((theme) => theme.id === id
+        ? { ...theme, webMapKey, selectedLayerKeys: [...keys] }
+        : theme))
+    },
     add: (name: string): void => { save([...themes, { id: newId(), name }]) },
     rename: (id: string, name: string): void => {
       save(themes.map((theme) => theme.id === id ? { ...theme, name } : theme))
@@ -37,7 +45,10 @@ export function useThemeManagement(props: AllWidgetSettingProps<IMConfig>): IThe
       const source = themes[index]
       if (!source) return
       const next = [...themes]
-      next.splice(index + 1, 0, { ...source, id: newId(), name: `${source.name} (${suffix})` })
+      next.splice(index + 1, 0, {
+        ...source, id: newId(), name: `${source.name} (${suffix})`,
+        selectedLayerKeys: [...(source.selectedLayerKeys ?? [])]
+      })
       save(next)
     },
     remove: (id: string): void => { save(themes.filter((theme) => theme.id !== id)) },

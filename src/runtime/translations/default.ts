@@ -16,5 +16,10 @@ export default {
   "applyError": "The layer visibility could not be changed.",
   "themeApplied": "Theme applied.",
   "resetApplied": "Saved WebMap visibility restored.",
-  "retry": "Try again"
+  "retry": "Try again",
+  "loadingServices": "Loading theme services…",
+  "invalidService": "A service configuration is incomplete or its layer no longer exists.",
+  "serviceProjection": "The service or selected WMTS tile matrix set does not support the map coordinate system.",
+  "externalTarget": "A configured target group or position no longer exists.",
+  "externalLoadError": "A theme service could not be loaded. The previous theme was retained."
 }

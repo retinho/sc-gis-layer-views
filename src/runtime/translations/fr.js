@@ -16,5 +16,10 @@ System.register([], function (_export) { return { execute: function () { _export
   "applyError": "La visibilité des couches n’a pas pu être modifiée.",
   "themeApplied": "Thème affiché.",
   "resetApplied": "Visibilité enregistrée de la WebMap restaurée.",
-  "retry": "Réessayer"
+  "retry": "Réessayer",
+  "loadingServices": "Chargement des services du thème…",
+  "invalidService": "La configuration d’un service est incomplète ou sa couche n’existe plus.",
+  "serviceProjection": "Le service ou la grille WMTS ne prend pas en charge le système de coordonnées de la carte.",
+  "externalTarget": "Un groupe ou une position configurés n’existent plus.",
+  "externalLoadError": "Un service du thème n’a pas pu être chargé. Le thème précédent est conservé."
 }); } }; });

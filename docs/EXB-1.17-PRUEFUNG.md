@@ -42,3 +42,16 @@ Die [Esri-Versionstabelle](https://developers.arcgis.com/experience-builder/guid
 - Derzeit deaktivierte Buttons verändern weder Karte noch Kameraposition.
 
 Es wurden ausschliesslich Korrekturen am Grundgerüst vorgenommen. Themenverwaltung, Sichtbarkeitsschaltung und externe Dienste bleiben spätere Schritte.
+
+## Erweiterung 0.6.0: externe Dienste pro Thema
+
+- Native `esri/layers/WMSLayer` und `WMTSLayer`, keine zusätzliche Laufzeitbibliothek. Capabilities werden über `load()` gelesen; die temporären Vorschauobjekte werden danach zerstört.
+- WMS-Auswahl über `allSublayers` / `findSublayerByName`, WMTS über `sublayers`, `tileMatrixSets` und `activeLayer`. Referenzen: [WMSLayer](https://developers.arcgis.com/javascript/latest/references/core/layers/WMSLayer/), [WMTSLayer](https://developers.arcgis.com/javascript/latest/references/core/layers/WMTSLayer/).
+- Versionsprüfung der Dienst- und Sitzungslogik mit den offiziellen `@arcgis/core@4.32`-Deklarationen (`interfaces.d.ts`) und TypeScript 5.7.3 im Strict-Modus: keine Fehler. Für diesen isolierten Test wurden ausschliesslich die Modulnamen auf die offiziellen SDK-Typen abgebildet und `ImmutableObject` als Readonly-Typ ersetzt. Dies ersetzt keinen vollständigen ExB-Build.
+- Bestehende Gruppen werden über `GroupLayer.layers` verwendet, niemals über Gruppen eines MapImage-Dienstes. Die SDK-Reihenfolge ist unten nach oben; die Konfiguration beschreibt die sichtbare Listenreihenfolge oben nach unten.
+- Sichtbare zusätzliche Kinder aktivieren ihre übergeordneten Gruppen. Beim Reset werden die gespeicherten Gruppenmodi und Sichtbarkeiten wiederhergestellt.
+- Vor einer Änderung werden alle neuen Dienste geladen. Bei einem Ladefehler bleibt die bisherige Karte erhalten. Neue Objekte werden bei Fehlern oder verworfenen asynchronen Aufträgen zerstört.
+- Eigene Layer werden anhand ihrer Objektidentität verwaltet. Themenwechsel, Reset und Abbau der Widget-Instanz entfernen eigene Dienste; andere hinzugefügte Layer werden nicht gelöscht.
+- [Esri Release Notes 1.17](https://developers.arcgis.com/experience-builder/guide/1.17/whats-new/) beschreiben die Option des Map-Layers-Widgets, zur Laufzeit hinzugefügte Layer anzuzeigen. Diese Option im verwendeten Standardwidget aktivieren.
+- Automatisierte Regressionen: Position in Gruppen und Hauptebene, Reihenfolge, Startsichtbarkeit, übergeordnete Gruppen, erneutes Anzeigen ohne Duplikate, Themenwechsel, Reset, Fremdlayer-Erhalt, fehlende Ziele, Ladefehler, Abbruch während des Ladens und unabhängige Dialogentwürfe.
+- TypeScript-/TSX-/JavaScript-Syntaxprüfung bestanden. Vollständiger ExB-Build und Darstellung realer WMS-/WMTS-Dienste sind auf der Zielinstallation zu prüfen.

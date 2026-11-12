@@ -2,10 +2,10 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.5.0 — Konfiguration im Dialog
+## Stand 0.6.0 — Externe WMS-/WMTS-Dienste pro Thema
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
-„Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Die Konfiguration zusätzlicher externer Dienste folgt als nächster Schritt.
+„Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Zusätzliche WMS-/WMTS-Layer werden pro Thema konfiguriert, beim Anzeigen eingefügt und bei Themenwechsel oder Reset vollständig entfernt.
 
 ## Herunterladen und installieren
 
@@ -21,7 +21,7 @@ Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus e
 
 Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Dieser Zwischenstand ist **nicht produktionsreif**. Build und visuelle Abnahme von 0.5.0 in ExB 1.17 stehen aus; lokal ist kein vollständiges ExB-SDK installiert. Der Nutzer hat den Layerbaum und die Auswahl aus 0.3.1 bestätigt; eine ausdrückliche Abnahme der Themenaktivierung aus 0.4.0 steht noch aus.
+Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.6.0 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
 
 ## Branches
 
@@ -102,3 +102,29 @@ Das Settingspanel zeigt die Kartenwahl und kompakte Themenkarten mit „Thema ko
 Verwendet werden `Modal` und `ModalHeader` aus `jimu-ui`. Die in den [ExB-1.17-Release-Notes](https://developers.arcgis.com/experience-builder/guide/1.17/whats-new/) entfernte Modal-Property `container` wird nicht verwendet. Die Builder-Seitenleiste und globale Modal-CSS-Regeln werden nicht überschrieben. Die bisherigen Calcite-Kontrastkorrekturen sind auch innerhalb des Dialogs lokal angebunden.
 
 Prüfung: Syntaxprüfung und Logiktests inklusive unabhängiger Entwürfe, Abbrechen/erneutes Öffnen, gemeinsamer Übernahme und unveränderter übriger Themen erfolgreich. In ExB noch prüfen: Öffnen, Scrollen bei tiefen Gruppen, Tastaturfokus/Escape, Abbrechen, Übernehmen, erneut Öffnen, Speichern/Neuladen und Darstellung im dunklen Builder.
+
+## Externe Dienste konfigurieren (0.6.0)
+
+1. „Thema konfigurieren“ öffnen und unter dem Layerbaum „Dienst-Layer hinzufügen“ wählen.
+2. WMS oder WMTS wählen, HTTPS-Dienstadresse eingeben und „Dienst laden“ anklicken. Bei WMTS den passenden Abfragemodus KVP oder REST wählen.
+3. Einen angebotenen Layer wählen. Für mehrere Layer desselben Dienstes mehrere Einträge erstellen. Bei WMTS zusätzlich das Kachelraster wählen: Es muss dem Koordinatensystem der Karte entsprechen (beispielsweise EPSG:2056 für MN95).
+4. Anzeigenamen, Zielgruppe und Position wählen. Vorhandene WebMap-Gruppen einschliesslich verschachtelter Gruppen sind möglich. Untergruppen innerhalb eines MapImage-Dienstes sind keine Container für externe Dienste.
+5. „Beim Aktivieren dieses Themas sichtbar“ einschalten oder ausschalten. Ein ausgeschalteter Dienst wird beim Anzeigen ebenfalls hinzugefügt und ist anschliessend über die Standard-Layerliste einschaltbar. Bei Einträgen an derselben Position bestimmen die Pfeilaktionen ihre Reihenfolge.
+6. „Übernehmen“ wählen und die Experience speichern. Abbrechen verwirft die Dienständerungen gemeinsam mit dem übrigen Themenentwurf.
+
+Im Standard-Kartenlayer-Widget die Anzeige **zur Laufzeit hinzugefügter Layer** aktivieren. ExB 1.17 bietet diese Option; eine fest konfigurierte Layerauswahl kann neue Dienste ansonsten ausblenden.
+
+Der Experience-Start bleibt unverändert. „Anzeigen“ lädt zunächst alle konfigurierten Dienste. Schlägt ein Dienst fehl, bleibt das bisherige Thema bestehen. Beim Themenwechsel werden dessen Dienste vollständig entfernt; Reset entfernt alle Dienste dieser Widget-Instanz und stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Kartenausschnitt und Zoom bleiben unverändert. Andere Widgets hinzugefügte Layer werden nicht gelöscht. Beim Wechsel der verknüpften Karte oder Abbau der Widget-Instanz werden eigene Dienste ebenfalls entfernt.
+
+Die Dienstadresse muss aus dem Browser erreichbar sein und dessen Zugriff erlauben (HTTPS, CORS, gegebenenfalls Anmeldung). Es werden keine separaten Zugangsdaten im Widget gespeichert. Bei WMTS wird ein nicht passendes Kachelraster mit einer Meldung abgelehnt; die Karte wird nicht auf ein anderes Koordinatensystem umgestellt.
+
+### Abnahme dieser Erweiterung
+
+- WMS und WMTS laden, konfigurieren, Experience speichern und neu laden.
+- Je einen Dienst in der Hauptebene und einer verschachtelten Gruppe platzieren; Position und Namen in der Standard-Layerliste prüfen.
+- Sichtbaren und zunächst ausgeschalteten Dienst prüfen. Letzteren über die Standard-Layerliste einschalten.
+- Zwischen zwei Themen wechseln und dasselbe Thema mehrfach anzeigen: keine übrig gebliebenen Dienste oder Duplikate.
+- Reset: gespeicherte WebMap-Sichtbarkeit, keine eigenen externen Dienste mehr, unveränderter Ausschnitt und Zoom.
+- Ungültige Dienstadresse in einem weiteren Thema testen: verständliche Meldung und bisheriges Thema bleibt erhalten.
+
+Lokal: `node tests/layer-selection.mjs` mit Node.js >=22.13 prüft die tatsächlichen reinen TypeScript-Module, einschliesslich Dienst-Lebenszyklus mit simulierten SDK-Collections. Die Netzwerk- und Darstellungsprüfung erfolgt in ExB.

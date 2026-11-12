@@ -11,7 +11,14 @@ const temporaryDirectory = await mkdtemp(join(tmpdir(), 'layer-views-test-'))
 async function load(relative) {
   const source = await readFile(new URL(relative, import.meta.url), 'utf8')
   const output = join(temporaryDirectory, basename(relative).replace(/\.ts$/, '.mjs'))
-  await writeFile(output, stripTypeScriptTypes(source))
+  let stripped = stripTypeScriptTypes(source)
+  const imports = [...stripped.matchAll(/from ['"](\.[^'"]+)['"]/g)]
+  for (const match of imports) {
+    const dependency = new URL(match[1] + '.ts', new URL(relative, import.meta.url))
+    await load(dependency.href)
+    stripped = stripped.replace(match[0], `from '${pathToFileURL(join(temporaryDirectory, basename(dependency.pathname).replace(/\.ts$/, '.mjs'))).href}'`)
+  }
+  await writeFile(output, stripped)
   return import(pathToFileURL(output).href)
 }
 const { getLeafKeys, getSelectionState, toggleSelection } = await load('../src/setting/layer-selection.ts')
@@ -127,7 +134,7 @@ draft.selectedLayerKeys.push('b')
 assert.equal(persisted.name, 'Original')
 assert.equal(persisted.webMapKey, 'original-map')
 assert.deepEqual(persisted.selectedLayerKeys, ['a'])
-assert.deepEqual(createThemeDraft(persisted), { ...persisted, selectedLayerKeys: ['a'] }, 'Reopening after Cancel must use the persisted values')
+assert.deepEqual(createThemeDraft(persisted), { ...persisted, selectedLayerKeys: ['a'], externalLayers: [] }, 'Reopening after Cancel must use the persisted values')
 const otherTheme = { id: 'other', name: 'Other' }
 const applied = mergeThemeDraft([persisted, otherTheme], draft)
 assert.equal(applied[0].name, 'Edited')
@@ -137,6 +144,98 @@ assert.equal(applied[1], otherTheme)
 draft.selectedLayerKeys.push('c')
 assert.deepEqual(applied[0].selectedLayerKeys, ['a', 'b'], 'Apply must not retain mutable draft arrays')
 assert.deepEqual(mergeThemeDraft([otherTheme], draft), [otherTheme], 'Do not resurrect a deleted theme')
-console.log('Layer selection and tree mapping assertions passed.')
+// External services: placement, ownership, rollback and asynchronous cancellation.
+const { ExternalSession } = await load('../src/runtime/external-session.ts')
+const { isValidExternalLayer } = await load('../src/shared/external-config.ts')
+const mutableCollection = (items = []) => ({
+  toArray: () => [...items], indexOf: (item) => items.indexOf(item),
+  add(item, index = items.length) { items.splice(index, 0, item) },
+  remove(item) { const index = items.indexOf(item); if (index >= 0) items.splice(index, 1) }
+})
+const originalLayer = { ...feature('original'), visible: true }
+const target = { type: 'group', id: 'target', visible: false, visibilityMode: 'exclusive', layers: mutableCollection([originalLayer]) }
+const unrelated = { ...feature('another-widget'), visible: true }
+const map = { layers: mutableCollection([unrelated, target]) }
+const savedDefaults = snapshotVisibility(collectVisibility(map.layers.toArray()))
+const groupKey = JSON.stringify(['layer:target'])
+const anchorKey = JSON.stringify(['layer:target', 'layer:original'])
+const external = { id: 'external', type: 'WMS', url: 'https://example.org/wms', title: 'External', layerId: 'layer', serviceMode: 'KVP', visible: true, groupKey, beforeLayerKey: anchorKey }
+const makeLayer = (entry, id) => ({ id, type: entry.type.toLowerCase(), visible: false, destroyed: false, destroy() { this.destroyed = true } })
+const session = new ExternalSession(map, 'widget', async (entry, id) => {
+  if (entry.layerId === 'failure') throw new Error('network')
+  return makeLayer(entry, id)
+})
+const externalTheme = { id: 'theme', name: 'Theme', selectedLayerKeys: [], externalLayers: [external, { ...external, id: 'second', visible: false }] }
+assert.equal(isValidExternalLayer(external), true)
+assert.equal(isValidExternalLayer({ ...external, url: 'http://example.org' }), false)
+assert.equal(isValidExternalLayer({ ...external, type: 'WMTS' }), false)
+await session.apply(externalTheme, savedDefaults)
+const added = target.layers.toArray()
+assert.equal(added.length, 3)
+assert.ok(added[2].id.endsWith('-external'), 'First configured entry must appear above the second')
+assert.equal(added[2].visible, true)
+assert.equal(added[1].visible, false)
+assert.equal(target.visible, true, 'Visible external child must enable its parent')
+assert.equal(target.visibilityMode, 'independent')
+assert.equal(originalLayer.visible, false)
+assert.equal(map.layers.toArray().includes(unrelated), true)
+await assert.rejects(session.apply({ ...externalTheme, externalLayers: [{ ...external, layerId: 'failure' }] }, savedDefaults), /network/)
+assert.deepEqual(target.layers.toArray(), added, 'Failed load must retain previous layers')
+assert.equal(added[2].destroyed, false)
+await assert.rejects(session.apply({ ...externalTheme, externalLayers: [{ ...external, groupKey: 'missing' }] }, savedDefaults), /externalTarget/)
+assert.deepEqual(target.layers.toArray(), added)
+await session.apply(externalTheme, savedDefaults)
+assert.equal(target.layers.toArray().length, 3, 'Reapplying must not duplicate layers')
+assert.equal(added[2].destroyed, true)
+await session.apply({ id: 'empty', name: 'Empty', selectedLayerKeys: [] }, savedDefaults)
+assert.deepEqual(target.layers.toArray(), [originalLayer], 'Switching to a theme without services removes all owned layers')
+await session.apply({ ...externalTheme, externalLayers: [{ ...external, groupKey: undefined, beforeLayerKey: undefined }] }, savedDefaults)
+assert.equal(map.layers.toArray()[0].type, 'wms', 'Root bottom placement')
+await session.apply(undefined, savedDefaults)
+assert.deepEqual(snapshotVisibility(collectVisibility(map.layers.toArray())), savedDefaults)
+assert.deepEqual(target.layers.toArray(), [originalLayer])
+assert.deepEqual(map.layers.toArray(), [unrelated, target], 'Reset must preserve other widgets’ layers')
+let resolvePending
+let pendingLayer
+const pending = new ExternalSession(map, 'pending', (entry, id) => new Promise((resolve) => { pendingLayer = makeLayer(entry, id); resolvePending = resolve }))
+const operation = pending.apply({ ...externalTheme, externalLayers: [external] }, savedDefaults)
+pending.dispose()
+resolvePending(pendingLayer)
+assert.equal(await operation, false)
+assert.equal(pendingLayer.destroyed, true)
+assert.deepEqual(target.layers.toArray(), [originalLayer])
+// Partial loading failure destroys successfully loaded peers without changing the map.
+let successfulPeer
+const failingBatch = new ExternalSession(map, 'batch', async (entry, id) => {
+  if (entry.id === 'fail') throw undefined
+  successfulPeer = makeLayer(entry, id)
+  return successfulPeer
+})
+let rejectedBatch = false
+try { await failingBatch.apply({ ...externalTheme, externalLayers: [external, { ...external, id: 'fail' }] }, savedDefaults) } catch { rejectedBatch = true }
+assert.equal(rejectedBatch, true)
+assert.equal(successfulPeer.destroyed, true)
+assert.deepEqual(target.layers.toArray(), [originalLayer])
+// If insertion itself fails, restore the previous theme and its visibility.
+await session.apply({ ...externalTheme, externalLayers: [external] }, savedDefaults)
+const beforeInsertionFailure = target.layers.toArray()
+const beforeInsertionVisibility = snapshotVisibility(collectVisibility(map.layers.toArray()))
+const originalAdd = target.layers.add
+let rejectInsertion = true
+target.layers.add = function (item, index) {
+  if (rejectInsertion) { rejectInsertion = false; throw new Error('insertion failed') }
+  return originalAdd.call(this, item, index)
+}
+await assert.rejects(session.apply(externalTheme, savedDefaults), /insertion failed/)
+assert.deepEqual(target.layers.toArray(), beforeInsertionFailure)
+assert.deepEqual(snapshotVisibility(collectVisibility(map.layers.toArray())), beforeInsertionVisibility)
+target.layers.add = originalAdd
+await session.apply(undefined, savedDefaults)
+const configured = { ...persisted, externalLayers: [external] }
+const externalDraft = createThemeDraft(configured)
+externalDraft.externalLayers[0].title = 'Edited'
+assert.equal(configured.externalLayers[0].title, 'External')
+session.dispose()
+console.log('Layer selection, visibility, dialog drafts and external-service lifecycle assertions passed.')
 
 await rm(temporaryDirectory, { recursive: true, force: true })

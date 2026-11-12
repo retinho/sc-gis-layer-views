@@ -20,6 +20,7 @@ function layerNode(layer: Layer, parent: string[]): ILayerNode {
   }
   return {
     key: JSON.stringify(path), title: layer.title || layer.id, children,
+    isGroup: layer.type === 'group',
     selectable: layer.type !== 'group' && layer.type !== 'unsupported' && layer.type !== 'unknown'
   }
 }

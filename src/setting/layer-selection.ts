@@ -3,6 +3,7 @@ export interface ILayerNode {
   title: string
   children: ILayerNode[]
   selectable: boolean
+  isGroup?: boolean
 }
 
 export interface ISelectionState {

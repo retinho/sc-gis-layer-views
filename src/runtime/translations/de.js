@@ -16,5 +16,10 @@ System.register([], function (_export) { return { execute: function () { _export
   "applyError": "Die Layer-Sichtbarkeit konnte nicht geändert werden.",
   "themeApplied": "Thema angezeigt.",
   "resetApplied": "Gespeicherte WebMap-Sichtbarkeit wiederhergestellt.",
-  "retry": "Erneut versuchen"
+  "retry": "Erneut versuchen",
+  "loadingServices": "Dienste des Themas werden geladen …",
+  "invalidService": "Eine Dienstkonfiguration ist unvollständig oder ihr Layer existiert nicht mehr.",
+  "serviceProjection": "Der Dienst oder das gewählte WMTS-Kachelraster unterstützt das Koordinatensystem der Karte nicht.",
+  "externalTarget": "Eine konfigurierte Zielgruppe oder Position existiert nicht mehr.",
+  "externalLoadError": "Ein Dienst des Themas konnte nicht geladen werden. Das bisherige Thema bleibt erhalten."
 }); } }; });

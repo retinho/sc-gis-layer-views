@@ -12,7 +12,7 @@ export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElem
   const mapWidgetId = props.useMapWidgetIds?.[0]
   const themes = props.config?.themes ?? []
   const currentView = mapView?.mapWidgetId === mapWidgetId ? mapView : undefined
-  const controller = useLayerThemes(currentView)
+  const controller = useLayerThemes(currentView, props.id)
   const translate = (key: keyof typeof messages): string =>
     props.intl.formatMessage({ id: key, defaultMessage: messages[key] })
   const headingId = `${props.id}-themes`
@@ -35,7 +35,7 @@ export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElem
         </Col>
       </Row>
       {(!mapWidgetId || !currentView || controller.message) && <div id={statusId} className="status" role="status">
-        {controller.message === 'loadingMap' && <CalciteLoader inline label={translate('loadingMap')} />}
+        {(controller.message === 'loadingMap' || controller.message === 'loadingServices') && <CalciteLoader inline label={translate('loadingMap')} />}
         {!mapWidgetId ? translate('noMap') : !currentView ? translate('waitingMap') : controller.message ? translate(controller.message) : null}
         {controller.message === 'mapLoadError' && <CalciteButton appearance="outline" kind="neutral" onClick={controller.retry}>
           {translate('retry')}
@@ -49,7 +49,7 @@ export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElem
                 <Col className="theme-name p-0">{theme.name}</Col>
                 <Col xs="auto" className="p-0">
                   <CalciteButton className="show-theme" kind="neutral" disabled={!controller.ready}
-                    onClick={() => controller.apply({ ...theme, selectedLayerKeys: Array.from(theme.selectedLayerKeys ?? []) })}
+                    onClick={() => controller.apply({ ...theme, selectedLayerKeys: Array.from(theme.selectedLayerKeys ?? []), externalLayers: Array.from(theme.externalLayers ?? []).map((entry) => ({ ...entry })) })}
                     label={`${translate('show')}: ${theme.name}`}>
                     {translate('show')}
                   </CalciteButton>

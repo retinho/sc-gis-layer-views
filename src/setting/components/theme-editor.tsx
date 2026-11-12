@@ -9,6 +9,9 @@ import messages from '../translations/default'
 import { createThemeDraft } from '../theme-draft'
 import { useWebMapTree } from '../hooks/useWebMapTree'
 import { getLeafKeys } from '../layer-selection'
+import { ExternalEditor } from './external-editor'
+import { isValidExternalLayer } from '../../shared/external-config'
+import type { ILayerNode } from '../layer-selection'
 import { LayerTree } from './layer-tree'
 
 interface IThemeEditorProps {
@@ -31,6 +34,20 @@ export function ThemeEditor({ theme, sources, translate, onApply, onCancel }: IT
   const changeSelection = (keys: string[]): void => {
     setDraft((current) => ({ ...current, webMapKey: tree.webMapKey, selectedLayerKeys: [...keys] }))
   }
+  const validPlacement = (entry: NonNullable<ILayerTheme['externalLayers']>[number]): boolean => {
+    const findGroup = (nodes: readonly ILayerNode[]): ILayerNode | undefined => {
+      for (const node of nodes) {
+        if (node.isGroup && node.key === entry.groupKey) return node
+        const found = findGroup(node.children)
+        if (found) return found
+      }
+      return undefined
+    }
+    const group = entry.groupKey ? findGroup(tree.nodes) : undefined
+    const siblings = entry.groupKey ? group?.children : tree.nodes
+    return Boolean(siblings && (!entry.beforeLayerKey || siblings.some((node) => node.key === entry.beforeLayerKey)))
+  }
+  const invalidServices = (draft.externalLayers ?? []).some((entry) => !isValidExternalLayer(entry) || !validPlacement(entry))
   const apply = (): void => {
     // A newly configured empty theme is valid: it intentionally hides all operational layers.
     onApply({ ...draft, webMapKey: draft.webMapKey ?? (tree.status === 'ready' ? tree.webMapKey : undefined) })
@@ -71,12 +88,15 @@ export function ThemeEditor({ theme, sources, translate, onApply, onCancel }: IT
             <LayerTree nodes={tree.nodes} selected={draft.selectedLayerKeys ?? []}
               expandLabel={translate('expandGroup')} collapseLabel={translate('collapseGroup')} onChange={changeSelection} />
           </div>)}
+          {tree.status === 'ready' && !differentMap && <ExternalEditor entries={draft.externalLayers ?? []} nodes={tree.nodes} translate={translate}
+            onChange={(externalLayers) => setDraft((current) => ({ ...current, webMapKey: tree.webMapKey, externalLayers }))} />}
+          {invalidServices && <p role="alert">{translate('invalidServices')}</p>}
         </div>
         <div className="editor-footer">
           <span>{translate('applyHint')}</span>
           <div className="footer-actions">
             <CalciteButton appearance="outline" kind="neutral" onClick={onCancel}>{translate('cancel')}</CalciteButton>
-            <CalciteButton disabled={!draft.name.trim() || differentMap || tree.status === 'loading'} onClick={apply}>{translate('apply')}</CalciteButton>
+            <CalciteButton disabled={!draft.name.trim() || differentMap || invalidServices || tree.status === 'loading'} onClick={apply}>{translate('apply')}</CalciteButton>
           </div>
         </div>
       </div>
@@ -94,6 +114,9 @@ const editorStyles = css`
   h3 { font-size: 18px; margin: 20px 0 8px; }
   calcite-label { color: inherit; --calcite-label-text-color: currentColor; }
   calcite-button[kind="neutral"] { color: inherit; --calcite-button-text-color: currentColor; --calcite-button-border-color: currentColor; --calcite-button-background-color: transparent; }
+  .external-entry { border: 1px solid currentColor; padding: 16px; margin: 16px 0; }
+  .external-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .external-fields > * { min-width: 0; }
   .layer-section { margin-top: 16px; }
   .layer-tree, .layer-tree ul { list-style: none; margin: 0; padding: 0; }
   .layer-tree ul { padding-left: 24px; }

@@ -14,7 +14,7 @@ interface IThemeManagement {
 
 export function useThemeManagement(props: AllWidgetSettingProps<IMConfig>): IThemeManagement {
   const themes: ILayerTheme[] = Array.from(props.config?.themes ?? [], (theme) => ({
-    ...theme, selectedLayerKeys: Array.from(theme.selectedLayerKeys ?? [])
+    ...theme, selectedLayerKeys: Array.from(theme.selectedLayerKeys ?? []), externalLayers: Array.from(theme.externalLayers ?? [], (entry) => ({ ...entry }))
   }))
   const save = (next: ILayerTheme[]): void => {
     const config = props.config ?? Immutable<IConfig>({ themes: [] })
@@ -40,7 +40,8 @@ export function useThemeManagement(props: AllWidgetSettingProps<IMConfig>): IThe
       const next = [...themes]
       next.splice(index + 1, 0, {
         ...source, id: newId(), name: `${source.name} (${suffix})`,
-        selectedLayerKeys: [...(source.selectedLayerKeys ?? [])]
+        selectedLayerKeys: [...(source.selectedLayerKeys ?? [])],
+        externalLayers: (source.externalLayers ?? []).map((entry) => ({ ...entry }))
       })
       save(next)
     },

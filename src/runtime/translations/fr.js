@@ -21,5 +21,7 @@ System.register([], function (_export) { return { execute: function () { _export
   "invalidService": "La configuration d’un service est incomplète ou sa couche n’existe plus.",
   "serviceProjection": "Le service ou la grille WMTS ne prend pas en charge le système de coordonnées de la carte.",
   "externalTarget": "Un groupe ou une position configurés n’existent plus.",
-  "externalLoadError": "Un service du thème n’a pas pu être chargé. Le thème précédent est conservé."
+  "externalLoadError": "Un service du thème n’a pas pu être chargé. Le thème précédent est conservé.",
+  "externalPrepareError": "Le service a été chargé, mais sa couche sélectionnée n’a pas pu être préparée. Le thème précédent est conservé.",
+  "externalApplyError": "Les couches du service n’ont pas pu être appliquées à la carte. Le thème précédent a été restauré."
 }); } }; });

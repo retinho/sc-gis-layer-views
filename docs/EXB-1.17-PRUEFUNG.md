@@ -55,3 +55,11 @@ Es wurden ausschliesslich Korrekturen am Grundgerüst vorgenommen. Themenverwalt
 - [Esri Release Notes 1.17](https://developers.arcgis.com/experience-builder/guide/1.17/whats-new/) beschreiben die Option des Map-Layers-Widgets, zur Laufzeit hinzugefügte Layer anzuzeigen. Diese Option im verwendeten Standardwidget aktivieren.
 - Automatisierte Regressionen: Position in Gruppen und Hauptebene, Reihenfolge, Startsichtbarkeit, übergeordnete Gruppen, erneutes Anzeigen ohne Duplikate, Themenwechsel, Reset, Fremdlayer-Erhalt, fehlende Ziele, Ladefehler, Abbruch während des Ladens und unabhängige Dialogentwürfe.
 - TypeScript-/TSX-/JavaScript-Syntaxprüfung bestanden. Vollständiger ExB-Build und Darstellung realer WMS-/WMTS-Dienste sind auf der Zielinstallation zu prüfen.
+
+## Korrektur 0.6.1: WMS-Unterlayer ohne unnötiges Klonen
+
+Beim Anzeigen wurde der bereits geladene WMS-Unterlayer mit `clone()` kopiert. Die offizielle [SDK-4.32-Implementierung](https://js.arcgis.com/4.32/esri/layers/support/WMSSublayer.js) ruft darin bei vorhandenem Property `fullExtent.clone()` ohne Nullprüfung auf. Ein fehlender Extent kann deshalb eine Ausnahme verursachen. Da jede Dienstkonfiguration bereits eine eigene WMSLayer-Instanz erhält, wird nun der geladene Unterlayer direkt übernommen, wie im [Esri-Beispiel für WMSSublayer](https://developers.arcgis.com/javascript/latest/references/core/layers/support/WMSSublayer/) gezeigt. Damit bleiben auch Capabilities-Metadaten erhalten.
+
+Der Nutzer meldet erfolgreiches Laden der angebotenen Layer von `https://wms.geo.admin.ch` im Dialog, aber einen Fehler beim Anzeigen. Die öffentlichen Capabilities wurden erfolgreich abgerufen (1068 benannte Layer; EPSG:2056 wird auf Hauptebene angeboten). Der konkrete vom Nutzer ausgewählte Layer und die ursprüngliche Ausnahme sind noch unbekannt; ein vollständiger Nachweis der Ursache in dessen ExB-Umgebung steht aus.
+
+Regression mit fehlendem Extent und absichtlich fehlschlagender Clone-Methode bestanden; Auswahl, Metadatenerhalt, Kindersichtbarkeit, fehlender Layer und Koordinatensystemprüfung getestet. Bestehende Regressionen, Strict-Typprüfung der Dienstlogik gegen SDK 4.32 und Syntaxprüfung bestanden. Fehlertexte unterscheiden jetzt Capabilities-Laden, Layer-Vorbereitung und Kartenanwendung. ExB-Build und Wiederholung des konkreten Nutzerfalls stehen aus.

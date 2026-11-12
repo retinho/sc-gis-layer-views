@@ -1,6 +1,6 @@
 import WMSLayer from 'esri/layers/WMSLayer'
 import WMTSLayer from 'esri/layers/WMTSLayer'
-import type WMSSublayer from 'esri/layers/support/WMSSublayer'
+import { configureWmsSelection } from './wms-selection'
 import type SpatialReference from 'esri/geometry/SpatialReference'
 import type { IExternalLayer } from '../config'
 import { isValidServiceUrl, isValidExternalLayer } from './external-config'
@@ -32,18 +32,13 @@ export async function createExternalLayer(entry: IExternalLayer, id: string, spa
   if (!isValidExternalLayer(entry)) throw new Error('invalidService')
   const layer = entry.type === 'WMS' ? new WMSLayer({ id, url: entry.url, visible: false })
     : new WMTSLayer({ id, url: entry.url, serviceMode: entry.serviceMode, visible: false })
+  let loaded = false
   try {
     await layer.load()
+    loaded = true
     if (layer.type === 'wms') {
       const wms = layer as WMSLayer
-      const selected = wms.findSublayerByName(entry.layerId)?.clone()
-      if (!selected) throw new Error('invalidService')
-      const supported = selected.spatialReferences ?? wms.spatialReferences
-      if (supported?.length && !(typeof spatialReference.wkid === 'number' && supported.includes(spatialReference.wkid)) && !(spatialReference.isWebMercator && supported.some((wkid) => [3857, 102100, 102113].includes(wkid)))) throw new Error('serviceProjection')
-      const show = (item: WMSSublayer): void => { item.visible = true; item.sublayers?.forEach(show) }
-      show(selected)
-      wms.sublayers = [selected]
-      wms.spatialReference = spatialReference
+      configureWmsSelection(wms, entry.layerId, spatialReference)
     } else {
       const wmts = layer as WMTSLayer
       const selected = wmts.sublayers?.find((item) => item.id === entry.layerId)?.clone()
@@ -56,5 +51,9 @@ export async function createExternalLayer(entry: IExternalLayer, id: string, spa
     layer.title = entry.title
     layer.listMode = 'show'
     return layer
-  } catch (error) { layer.destroy(); throw error }
+  } catch (error: unknown) {
+    layer.destroy()
+    if (error instanceof Error && ['invalidService', 'serviceProjection'].includes(error.message)) throw error
+    throw new Error(loaded ? 'externalPrepareError' : 'externalLoadError')
+  }
 }

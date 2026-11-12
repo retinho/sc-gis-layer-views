@@ -21,5 +21,7 @@ export default {
   "invalidService": "A service configuration is incomplete or its layer no longer exists.",
   "serviceProjection": "The service or selected WMTS tile matrix set does not support the map coordinate system.",
   "externalTarget": "A configured target group or position no longer exists.",
-  "externalLoadError": "A theme service could not be loaded. The previous theme was retained."
+  "externalLoadError": "A theme service could not be loaded. The previous theme was retained.",
+  "externalPrepareError": "The service loaded, but its selected layer could not be prepared. The previous theme was retained.",
+  "externalApplyError": "The service layers could not be applied to the map. The previous theme was restored."
 }

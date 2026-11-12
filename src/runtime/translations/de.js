@@ -21,5 +21,7 @@ System.register([], function (_export) { return { execute: function () { _export
   "invalidService": "Eine Dienstkonfiguration ist unvollständig oder ihr Layer existiert nicht mehr.",
   "serviceProjection": "Der Dienst oder das gewählte WMTS-Kachelraster unterstützt das Koordinatensystem der Karte nicht.",
   "externalTarget": "Eine konfigurierte Zielgruppe oder Position existiert nicht mehr.",
-  "externalLoadError": "Ein Dienst des Themas konnte nicht geladen werden. Das bisherige Thema bleibt erhalten."
+  "externalLoadError": "Ein Dienst des Themas konnte nicht geladen werden. Das bisherige Thema bleibt erhalten.",
+  "externalPrepareError": "Der Dienst wurde geladen, aber sein gewählter Layer konnte nicht vorbereitet werden. Das bisherige Thema bleibt erhalten.",
+  "externalApplyError": "Die Dienst-Layer konnten nicht in der Karte angewendet werden. Das bisherige Thema wurde wiederhergestellt."
 }); } }; });

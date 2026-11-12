@@ -2,7 +2,7 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.6.0 — Externe WMS-/WMTS-Dienste pro Thema
+## Stand 0.6.1 — Externe WMS-/WMTS-Dienste pro Thema
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
 „Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Zusätzliche WMS-/WMTS-Layer werden pro Thema konfiguriert, beim Anzeigen eingefügt und bei Themenwechsel oder Reset vollständig entfernt.
@@ -21,7 +21,7 @@ Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus e
 
 Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.6.0 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
+Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.6.1 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
 
 ## Branches
 
@@ -128,3 +128,9 @@ Die Dienstadresse muss aus dem Browser erreichbar sein und dessen Zugriff erlaub
 - Ungültige Dienstadresse in einem weiteren Thema testen: verständliche Meldung und bisheriges Thema bleibt erhalten.
 
 Lokal: `node tests/layer-selection.mjs` mit Node.js >=22.13 prüft die tatsächlichen reinen TypeScript-Module, einschliesslich Dienst-Lebenszyklus mit simulierten SDK-Collections. Die Netzwerk- und Darstellungsprüfung erfolgt in ExB.
+
+## Korrektur 0.6.1
+
+WMS-Unterlayer werden direkt aus der jeweils eigenen geladenen Dienstinstanz verwendet. Das unnötige Klonen entfällt und vermeidet einen möglichen SDK-4.32-Fehler bei fehlender Layer-Ausdehnung. Fehlermeldungen unterscheiden jetzt Laden, Vorbereiten und Anwenden der Dienste. Bestehende Themen müssen nicht neu konfiguriert werden.
+
+Nach dem Aktualisieren und Kompilieren bitte dasselbe Thema erneut anzeigen und anschliessend Reset prüfen. Der konkrete Laufzeitfehler des gemeldeten WMS ist lokal nicht vollständig reproduziert; bei erneutem Fehler hilft die nun präzisere Meldung bei der Eingrenzung.

@@ -10,7 +10,7 @@ import type { TVisibilitySnapshot } from '../layer-visibility'
 import { ExternalSession } from '../external-session'
 import { createExternalLayer } from '../../shared/external-services'
 
-type TMessage = 'loadingServices' | 'invalidService' | 'serviceProjection' | 'externalTarget' | 'externalLoadError' | 'loadingMap' | 'mapLoadError' | 'wrongMap' | 'missingLayers' | 'unconfiguredTheme' | 'applyError' | 'themeApplied' | 'resetApplied' | null
+type TMessage = 'externalPrepareError' | 'externalApplyError' | 'loadingServices' | 'invalidService' | 'serviceProjection' | 'externalTarget' | 'externalLoadError' | 'loadingMap' | 'mapLoadError' | 'wrongMap' | 'missingLayers' | 'unconfiguredTheme' | 'applyError' | 'themeApplied' | 'resetApplied' | null
 interface IPreparedMap {
   view: JimuMapView
   map: ArcGISMap
@@ -85,8 +85,8 @@ export function useLayerThemes(view: JimuMapView | undefined, widgetId: string):
     }).catch((error: unknown) => {
       if (active.current !== session) return
       const reason = error instanceof Error ? error.message : ''
-      const known = ['missingLayers', 'invalidService', 'serviceProjection', 'externalTarget'] as const
-      setMessage(known.find((key) => key === reason) ?? (theme?.externalLayers?.length ? 'externalLoadError' : 'applyError'))
+      const known = ['missingLayers', 'invalidService', 'serviceProjection', 'externalTarget', 'externalPrepareError', 'externalLoadError'] as const
+      setMessage(known.find((key) => key === reason) ?? (theme?.externalLayers?.length ? 'externalApplyError' : 'applyError'))
     }).finally(() => { if (active.current === session) { running.current = false; setBusy(false) } })
   }
 

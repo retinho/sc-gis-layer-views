@@ -236,6 +236,19 @@ const externalDraft = createThemeDraft(configured)
 externalDraft.externalLayers[0].title = 'Edited'
 assert.equal(configured.externalLayers[0].title, 'External')
 session.dispose()
+// WMS with inherited extent: SDK 4.32 clone() can dereference null fullExtent.
+const { configureWmsSelection } = await load('../src/shared/wms-selection.ts')
+const wmsChild = { visible: false, sublayers: null }
+const wmsSelected = { name: 'selected', visible: false, fullExtent: null, spatialReferences: [2056], dimensions: [{ name: 'time' }], sublayers: { forEach: (fn) => fn(wmsChild) }, clone() { throw new TypeError('Cannot read properties of null (reading clone)') } }
+const wms = { findSublayerByName: (name) => name === 'selected' ? wmsSelected : undefined, spatialReferences: [2056], sublayers: [], spatialReference: undefined }
+const mn95 = { wkid: 2056, isWebMercator: false }
+configureWmsSelection(wms, 'selected', mn95)
+assert.equal(wms.sublayers[0], wmsSelected, 'Use the loaded sublayer without cloning or discarding metadata')
+assert.equal(wmsSelected.visible, true)
+assert.equal(wmsChild.visible, true)
+assert.equal(wms.spatialReference, mn95)
+assert.throws(() => configureWmsSelection(wms, 'missing', mn95), /invalidService/)
+assert.throws(() => configureWmsSelection(wms, 'selected', { wkid: 4326 }), /serviceProjection/)
 console.log('Layer selection, visibility, dialog drafts and external-service lifecycle assertions passed.')
 
 await rm(temporaryDirectory, { recursive: true, force: true })

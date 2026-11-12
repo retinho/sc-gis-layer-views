@@ -8,7 +8,7 @@ System.register([], function (_export) { return { execute: function () { _export
   "waitingMap": "En attente de la carte associée.",
   "empty": "Aucun thème configuré.",
   "foundation": "L’activation des thèmes et la réinitialisation suivront.",
-  "managementHelp": "Créez des thèmes et définissez leur ordre.",
+  "managementHelp": "Gérez les thèmes ici. Ouvrez « Configurer le thème » pour modifier le nom et les couches.",
   "newTheme": "Nouveau thème",
   "addTheme": "Ajouter un thème",
   "themeName": "Nom du thème",
@@ -30,5 +30,9 @@ System.register([], function (_export) { return { execute: function () { _export
   "collapseGroup": "Réduire le groupe",
   "webMapSource": "WebMap pour la sélection des couches",
   "layerSelection": "Sélection des couches",
-  "selectionUnavailable": "L’arborescence apparaîtra ici lorsque la WebMap configurée sera chargée."
+  "selectionUnavailable": "L’arborescence apparaîtra ici lorsque la WebMap configurée sera chargée.",
+  "configureTheme": "Configurer le thème",
+  "apply": "Appliquer",
+  "cancel": "Annuler",
+  "applyHint": "Appliquer met à jour la configuration du Builder. Enregistrez ensuite l’Experience."
 }); } }; });

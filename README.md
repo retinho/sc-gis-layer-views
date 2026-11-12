@@ -2,7 +2,7 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.4.0 — Themen anzeigen und Reset
+## Stand 0.5.0 — Konfiguration im Dialog
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
 „Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Die Konfiguration zusätzlicher externer Dienste folgt als nächster Schritt.
@@ -13,7 +13,7 @@ Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer 
 2. ZIP entpacken; den Ordner `sc-gis-layer-views-development` in `sc-gis-layer-views` umbenennen.
 3. Diesen Ordner unter `client/your-extensions/widgets/sc-gis-layer-views/` der bestehenden ExB-1.17-Installation ablegen. `manifest.json` muss direkt darin liegen, ohne zusätzliche Ordnerebene.
 4. Die Developer Edition nach deren Installationsanleitung starten/neustarten. Das Widget „Layer-Themen“ hinzufügen und in seinen Einstellungen ein vorhandenes Karten-Widget auswählen.
-5. Themen in den Widget-Einstellungen erstellen, benennen und die gewünschten Layer auswählen. Gruppen mit dem Pfeil öffnen. Die Gruppen-Checkbox wählt alle Kinder aus. Themen lassen sich duplizieren, sortieren und entfernen. Die Experience anschliessend speichern.
+5. Themen in den Widget-Einstellungen erstellen. Über „Thema konfigurieren“ den grossen Dialog öffnen, Namen bearbeiten und Layer auswählen. Gruppen mit dem Pfeil öffnen; die Gruppen-Checkbox wählt alle Kinder aus. „Übernehmen“ übernimmt den Entwurf, „Abbrechen“ verwirft ihn. Themen lassen sich im Settingspanel weiterhin duplizieren, sortieren und entfernen. Die Experience anschliessend speichern.
 
 ## Kompilieren und bereitstellen
 
@@ -21,7 +21,7 @@ Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus e
 
 Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Dieser Zwischenstand ist **nicht produktionsreif**. Build und visuelle Abnahme von 0.4.0 in ExB 1.17 stehen aus; lokal ist kein vollständiges ExB-SDK installiert. Der Nutzer hat den Layerbaum und die Auswahl aus 0.3.1 bestätigt.
+Dieser Zwischenstand ist **nicht produktionsreif**. Build und visuelle Abnahme von 0.5.0 in ExB 1.17 stehen aus; lokal ist kein vollständiges ExB-SDK installiert. Der Nutzer hat den Layerbaum und die Auswahl aus 0.3.1 bestätigt; eine ausdrückliche Abnahme der Themenaktivierung aus 0.4.0 steht noch aus.
 
 ## Branches
 
@@ -79,7 +79,7 @@ Der Nutzer hat bestätigt, dass in 0.3.1 der Layerbaum erscheint und Layer ausge
 
 ## Themen anzeigen und Reset 0.4.0
 
-- Änderungen im Einstellungsbereich werden sofort in die aktuelle Builder-Konfiguration übernommen. Die Experience danach speichern und für die öffentliche Anwendung veröffentlichen.
+- Aktionen in der Themenliste werden sofort in die aktuelle Builder-Konfiguration übernommen. Seit 0.5.0 bleiben Änderungen im Konfigurationsdialog bis „Übernehmen“ ein Entwurf. Die Experience danach speichern und für die öffentliche Anwendung veröffentlichen.
 - Beim Start werden nur die gespeicherten Standardwerte geladen. Die Karte wird nicht automatisch umgeschaltet.
 - „Anzeigen“ aktiviert alle ausgewählten Layer und ihre übergeordneten Gruppen und deaktiviert die übrigen operativen Layer. MapImageLayer-Unterlayer werden einzeln berücksichtigt. Die Basemap bleibt unverändert.
 - Gruppen werden für eine Themenauswahl auf unabhängige Sichtbarkeit gestellt, damit auch bisher exklusive oder geerbte Gruppen mehrere individuell gewählte Kinder zulassen. Reset stellt zusätzlich zu den Sichtbarkeiten die gespeicherten Gruppenmodi wieder her.
@@ -92,3 +92,13 @@ Der Nutzer hat bestätigt, dass in 0.3.1 der Layerbaum erscheint und Layer ausge
 Lokale Prüfung: Syntaxprüfung aller 14 TS-/TSX-Dateien sowie Logiktests für Gruppen, Unterlayer, Themenwechsel, leere Auswahl, wiederholtes Anzeigen, Reset einschliesslich Gruppenmodi, fehlende Layer und Rücknahme nach einem Schreibfehler erfolgreich. Kein vollständiger ExB-SDK-Build.
 
 Abnahme in ExB: Zwei unterschiedliche Themen anzeigen, Sichtbarkeit in Karte und Standard-Layerliste vergleichen, einen Layer dort manuell ändern und dasselbe Thema erneut anzeigen. Danach Reset mit den gespeicherten WebMap-Defaults vergleichen. Währenddessen müssen Kartenausschnitt und Zoom gleich bleiben. Auch ein Thema mit verschachtelten Gruppen und Map-Service-Unterlayern prüfen.
+
+## Dialog 0.5.0
+
+Das Settingspanel zeigt die Kartenwahl und kompakte Themenkarten mit „Thema konfigurieren“. Der Jimu-UI-Dialog ist 900 Pixel breit, maximal Bildschirmbreite minus 32 Pixel. Er hat einen unabhängig scrollbareren Inhaltsbereich und einen sichtbaren Abschlussbereich. Der Dialog öffnet die zum Thema gehörende WebMap, sofern sie beim Karten-Widget konfiguriert ist.
+
+„Übernehmen“ schreibt Name, WebMap-Zuordnung und Layerauswahl gemeinsam in die Builder-Konfiguration. „Abbrechen“, das Schliesskreuz und Escape schliessen ohne Übernahme. Ein Klick auf den Hintergrund schliesst den Dialog nicht versehentlich. Leere Namen sind nicht übernehmbar. Ein neu angelegtes Thema bleibt bei Abbrechen als unverändertes neues Thema in der Liste bestehen.
+
+Verwendet werden `Modal` und `ModalHeader` aus `jimu-ui`. Die in den [ExB-1.17-Release-Notes](https://developers.arcgis.com/experience-builder/guide/1.17/whats-new/) entfernte Modal-Property `container` wird nicht verwendet. Die Builder-Seitenleiste und globale Modal-CSS-Regeln werden nicht überschrieben. Die bisherigen Calcite-Kontrastkorrekturen sind auch innerhalb des Dialogs lokal angebunden.
+
+Prüfung: Syntaxprüfung und Logiktests inklusive unabhängiger Entwürfe, Abbrechen/erneutes Öffnen, gemeinsamer Übernahme und unveränderter übriger Themen erfolgreich. In ExB noch prüfen: Öffnen, Scrollen bei tiefen Gruppen, Tastaturfokus/Escape, Abbrechen, Übernehmen, erneut Öffnen, Speichern/Neuladen und Darstellung im dunklen Builder.

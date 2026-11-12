@@ -8,7 +8,7 @@ export default {
   "waitingMap": "Waiting for the connected map.",
   "empty": "No themes configured yet.",
   "foundation": "Theme activation and reset will follow in the next steps.",
-  "managementHelp": "Create themes and arrange their order.",
+  "managementHelp": "Manage themes here. Open Configure theme to edit the name and layers.",
   "newTheme": "New theme",
   "addTheme": "Add theme",
   "themeName": "Theme name",
@@ -30,5 +30,9 @@ export default {
   "collapseGroup": "Collapse group",
   "webMapSource": "WebMap for layer selection",
   "layerSelection": "Layer selection",
-  "selectionUnavailable": "The layer tree will appear here once the configured WebMap has loaded."
+  "selectionUnavailable": "The layer tree will appear here once the configured WebMap has loaded.",
+  "configureTheme": "Configure theme",
+  "apply": "Apply",
+  "cancel": "Cancel",
+  "applyHint": "Apply updates the Builder configuration. Save the Experience afterwards."
 }

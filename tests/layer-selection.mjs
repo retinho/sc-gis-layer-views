@@ -117,6 +117,26 @@ const rollbackNodes = [{ key: 'first', target: { visible: false }, children: [] 
 assert.throws(() => applyVisibility(rollbackNodes, { first: { visible: true }, failure: { visible: true } }), /setter failed/)
 assert.equal(rollbackNodes[0].target.visible, false)
 assert.equal(failureValue, false)
+// Dialog edits must never mutate persisted configuration before Apply.
+const { createThemeDraft, mergeThemeDraft } = await load('../src/setting/theme-draft.ts')
+const persisted = Object.freeze({ id: 'theme-one', name: 'Original', webMapKey: 'original-map', selectedLayerKeys: Object.freeze(['a']) })
+const draft = createThemeDraft(persisted)
+draft.name = ' Edited '
+draft.webMapKey = 'other-map'
+draft.selectedLayerKeys.push('b')
+assert.equal(persisted.name, 'Original')
+assert.equal(persisted.webMapKey, 'original-map')
+assert.deepEqual(persisted.selectedLayerKeys, ['a'])
+assert.deepEqual(createThemeDraft(persisted), { ...persisted, selectedLayerKeys: ['a'] }, 'Reopening after Cancel must use the persisted values')
+const otherTheme = { id: 'other', name: 'Other' }
+const applied = mergeThemeDraft([persisted, otherTheme], draft)
+assert.equal(applied[0].name, 'Edited')
+assert.equal(applied[0].webMapKey, 'other-map')
+assert.deepEqual(applied[0].selectedLayerKeys, ['a', 'b'])
+assert.equal(applied[1], otherTheme)
+draft.selectedLayerKeys.push('c')
+assert.deepEqual(applied[0].selectedLayerKeys, ['a', 'b'], 'Apply must not retain mutable draft arrays')
+assert.deepEqual(mergeThemeDraft([otherTheme], draft), [otherTheme], 'Do not resurrect a deleted theme')
 console.log('Layer selection and tree mapping assertions passed.')
 
 await rm(temporaryDirectory, { recursive: true, force: true })

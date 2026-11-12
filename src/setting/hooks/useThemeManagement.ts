@@ -1,15 +1,15 @@
 import { Immutable } from 'jimu-core'
 import { AllWidgetSettingProps } from 'jimu-for-builder'
 import { IConfig, ILayerTheme, IMConfig } from '../../config'
+import { mergeThemeDraft } from '../theme-draft'
 
 interface IThemeManagement {
   themes: ILayerTheme[]
+  updateTheme: (draft: ILayerTheme) => void
   add: (name: string) => void
-  rename: (id: string, name: string) => void
   duplicate: (id: string, suffix: string) => void
   remove: (id: string) => void
   move: (id: string, offset: -1 | 1) => void
-  selectLayers: (id: string, webMapKey: string, keys: readonly string[]) => void
 }
 
 export function useThemeManagement(props: AllWidgetSettingProps<IMConfig>): IThemeManagement {
@@ -31,15 +31,8 @@ export function useThemeManagement(props: AllWidgetSettingProps<IMConfig>): IThe
   }
   return {
     themes,
-    selectLayers: (id: string, webMapKey: string, keys: readonly string[]): void => {
-      save(themes.map((theme) => theme.id === id
-        ? { ...theme, webMapKey, selectedLayerKeys: [...keys] }
-        : theme))
-    },
+    updateTheme: (draft: ILayerTheme): void => { save(mergeThemeDraft(themes, draft)) },
     add: (name: string): void => { save([...themes, { id: newId(), name }]) },
-    rename: (id: string, name: string): void => {
-      save(themes.map((theme) => theme.id === id ? { ...theme, name } : theme))
-    },
     duplicate: (id: string, suffix: string): void => {
       const index = themes.findIndex((theme) => theme.id === id)
       const source = themes[index]

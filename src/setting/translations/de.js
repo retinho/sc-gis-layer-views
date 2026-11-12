@@ -8,7 +8,7 @@ System.register([], function (_export) { return { execute: function () { _export
   "waitingMap": "Warten auf die verknüpfte Karte.",
   "empty": "Noch keine Themen konfiguriert.",
   "foundation": "Themenaktivierung und Reset folgen in den nächsten Schritten.",
-  "managementHelp": "Themen erstellen und ihre Reihenfolge festlegen.",
+  "managementHelp": "Themen hier verwalten. Namen und Layer über „Thema konfigurieren“ bearbeiten.",
   "newTheme": "Neues Thema",
   "addTheme": "Thema hinzufügen",
   "themeName": "Themenname",
@@ -30,5 +30,9 @@ System.register([], function (_export) { return { execute: function () { _export
   "collapseGroup": "Gruppe zuklappen",
   "webMapSource": "WebMap für die Layerauswahl",
   "layerSelection": "Layerauswahl",
-  "selectionUnavailable": "Hier erscheint der Layerbaum, sobald die konfigurierte WebMap geladen ist."
+  "selectionUnavailable": "Hier erscheint der Layerbaum, sobald die konfigurierte WebMap geladen ist.",
+  "configureTheme": "Thema konfigurieren",
+  "apply": "Übernehmen",
+  "cancel": "Abbrechen",
+  "applyHint": "Übernehmen aktualisiert die Builder-Konfiguration. Danach die Experience speichern."
 }); } }; });

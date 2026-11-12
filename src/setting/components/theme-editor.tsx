@@ -63,6 +63,11 @@ export function ThemeEditor({ theme, sources, translate, onApply, onCancel }: IT
             <CalciteInput type="text" value={draft.name}
               onCalciteInputInput={(event) => { const name = event.target.value; setDraft((current) => ({ ...current, name })) }} />
           </CalciteLabel>
+          <CalciteLabel>
+            {translate('requester')}
+            <CalciteInput type="text" value={draft.requester ?? ''}
+              onCalciteInputInput={(event) => { const requester = event.target.value; setDraft((current) => ({ ...current, requester })) }} />
+          </CalciteLabel>
           {sources.length > 1 && <CalciteLabel>
             {translate('webMapSource')}
             <CalciteSelect label={translate('webMapSource')} value={source?.dataSourceId ?? ''}

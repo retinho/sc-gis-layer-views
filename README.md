@@ -2,7 +2,7 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.6.1 — Externe WMS-/WMTS-Dienste pro Thema
+## Stand 0.6.2 — Externe WMS-/WMTS-Dienste pro Thema
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
 „Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Zusätzliche WMS-/WMTS-Layer werden pro Thema konfiguriert, beim Anzeigen eingefügt und bei Themenwechsel oder Reset vollständig entfernt.
@@ -21,7 +21,7 @@ Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus e
 
 Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.6.1 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
+Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.6.2 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
 
 ## Branches
 
@@ -134,3 +134,13 @@ Lokal: `node tests/layer-selection.mjs` mit Node.js >=22.13 prüft die tatsächl
 WMS-Unterlayer werden direkt aus der jeweils eigenen geladenen Dienstinstanz verwendet. Das unnötige Klonen entfällt und vermeidet einen möglichen SDK-4.32-Fehler bei fehlender Layer-Ausdehnung. Fehlermeldungen unterscheiden jetzt Laden, Vorbereiten und Anwenden der Dienste. Bestehende Themen müssen nicht neu konfiguriert werden.
 
 Nach dem Aktualisieren und Kompilieren bitte dasselbe Thema erneut anzeigen und anschliessend Reset prüfen. Der konkrete Laufzeitfehler des gemeldeten WMS ist lokal nicht vollständig reproduziert; bei erneutem Fehler hilft die nun präzisere Meldung bei der Eingrenzung.
+
+## Besteller und Speicherung (0.6.2)
+
+Der Themendialog enthält ein optionales gemeinsames Textfeld „Besteller / E-Mail“, beispielsweise `Vorname Nachname, name@organisation.ch`. Übernehmen speichert es mit dem Themenentwurf; Abbrechen verwirft die Bearbeitung. Duplizieren übernimmt den Eintrag. Bestehende Themen bleiben kompatibel. Die Themenkarten zeigen das Feld nicht an.
+
+Alle Themen stehen in der Experience-Konfiguration unter `widgets[widgetId].config.themes`. Die Datei `config.json` im Widget-Quellordner enthält nur die Ausgangskonfiguration. Individuelle Einstellungen werden über Esris `onSettingChange` an den Builder übergeben; danach die Experience speichern und für die Benutzer veröffentlichen. Im Portal gehören sie zum Experience-Item, bei Developer-Edition-Apps zu deren App-Konfigurationsdateien unter `server/public/apps/<appId>/`. Sie werden weder ins GitHub-Repository noch in die WebMap zurückgeschrieben.
+
+Die Konfiguration wird mit der Experience geladen. Für Themenmetadaten ist dieser native Weg schlank und benötigt keine zusätzliche Datenbankabfrage. Karten- und Dienstladezeiten sind davon getrennt; insbesondere lädt das Widget beim Aktivieren die externen Dienste neu. Das Kontaktfeld wird zwar nur im Konfigurationsdialog angezeigt, ist als Teil der ausgelieferten App-Konfiguration technisch für berechtigte App-Benutzer einsehbar.
+
+Vom Nutzer bestätigt: WMS-Aktivierung mit 0.6.1 funktioniert.

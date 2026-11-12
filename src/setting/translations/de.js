@@ -57,5 +57,6 @@ System.register([], function (_export) { return { execute: function () { _export
   "externalServices": "Externe WMS-/WMTS-Dienste",
   "externalHelp": "Pro Dienst-Layer einen Eintrag hinzufügen. Einträge mit derselben Position erscheinen in dieser Reihenfolge. WMTS benötigt ein Kachelraster im Koordinatensystem der Karte.",
   "addService": "Dienst-Layer hinzufügen",
-  "invalidServices": "Alle Dienste vervollständigen und eine vorhandene Zielgruppe und Position wählen, bevor die Änderungen übernommen werden."
+  "invalidServices": "Alle Dienste vervollständigen und eine vorhandene Zielgruppe und Position wählen, bevor die Änderungen übernommen werden.",
+  "requester": "Besteller / E-Mail (optional)"
 }); } }; });

@@ -57,5 +57,6 @@ export default {
   "externalServices": "External WMS / WMTS services",
   "externalHelp": "Add one entry per service layer. Entries sharing a position appear in this order. WMTS requires a tile matrix set matching the map coordinate system.",
   "addService": "Add service layer",
-  "invalidServices": "Complete each service and choose an existing target group and position before applying."
+  "invalidServices": "Complete each service and choose an existing target group and position before applying.",
+  "requester": "Requested by / email (optional)"
 }

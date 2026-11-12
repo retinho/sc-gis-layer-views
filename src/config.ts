@@ -16,6 +16,7 @@ export interface IExternalLayer {
 export interface ILayerTheme {
   id: string
   name: string
+  requester?: string
   webMapKey?: string
   selectedLayerKeys?: readonly string[]
   externalLayers?: readonly IExternalLayer[]

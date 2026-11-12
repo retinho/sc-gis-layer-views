@@ -57,5 +57,6 @@ System.register([], function (_export) { return { execute: function () { _export
   "externalServices": "Services WMS / WMTS externes",
   "externalHelp": "Ajoutez une entrée par couche. Les entrées ayant la même position suivent cet ordre. WMTS exige une grille correspondant au système de coordonnées de la carte.",
   "addService": "Ajouter une couche de service",
-  "invalidServices": "Complétez les services et choisissez un groupe et une position existants avant d’appliquer."
+  "invalidServices": "Complétez les services et choisissez un groupe et une position existants avant d’appliquer.",
+  "requester": "Demandeur / e-mail (facultatif)"
 }); } }; });

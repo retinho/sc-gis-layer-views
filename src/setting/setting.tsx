@@ -23,6 +23,7 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>): React.R
   }
   return (
     <div className="widget-setting-sc-gis-layer-views" css={styles}>
+      <p className="widget-version">{translate('widgetVersion')}: {props.manifest.version}</p>
       <SettingSection title={translate('map')}>
         <SettingRow><MapWidgetSelector useMapWidgetIds={props.useMapWidgetIds} onSelect={selectMap} /></SettingRow>
       </SettingSection>
@@ -61,6 +62,7 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>): React.R
 }
 
 const styles = css`
+  .widget-version { margin: 0; padding: 12px 16px; font-size: 12px; color: inherit; }
   calcite-button[kind="neutral"] { color: inherit; --calcite-button-text-color: currentColor; --calcite-button-border-color: currentColor; --calcite-button-background-color: transparent; }
   .theme-editors { padding: 0; margin: 16px 0 0; list-style: none; }
   .theme-editor { padding: 12px 0; border-top: 1px solid currentColor; }

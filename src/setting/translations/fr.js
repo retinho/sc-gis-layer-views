@@ -74,5 +74,6 @@ System.register([], function (_export) { return { execute: function () { _export
   "resolveBeforeApply": "Affectez ou retirez toutes les références manquantes avant d’appliquer.",
   "filterServiceLayers": "Filtrer les couches par nom ou identifiant",
   "noLayerMatches": "Aucune couche correspondante. La sélection actuelle est conservée.",
-  "currentServiceLayer": "sélection actuelle"
+  "currentServiceLayer": "sélection actuelle",
+  "widgetVersion": "Version du widget"
 }); } }; });

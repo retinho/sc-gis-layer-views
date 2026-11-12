@@ -1,6 +1,6 @@
 # Vereinbarter Bauplan und Abnahmestand
 
-Stand: 0.7.2 auf development, 12. November 2026. Ziel: Experience Builder Developer Edition 1.17, ArcGIS Enterprise 11.5. Keine Produktionsfreigabe erteilt.
+Stand: 0.7.3 auf development, 12. November 2026. Ziel: Experience Builder Developer Edition 1.17, ArcGIS Enterprise 11.5. Keine Produktionsfreigabe erteilt.
 
 ## Umgesetzte Funktionen
 
@@ -35,7 +35,7 @@ Lokale Regressionen prüfen Sichtbarkeit, Gruppenmodi, Entwürfe, Abgleich, Plat
 
 Vor Freigabe auf dem Zielsystem prüfen:
 
-- 0.7.2 kompilieren; bestehende gespeicherte Experience öffnen, speichern und neu laden.
+- 0.7.3 kompilieren; bestehende gespeicherte Experience öffnen, speichern und neu laden.
 - Eigenen Dienst in eine andere Gruppe/Hauptebene verschieben; Reset und Themenwechsel ohne zurückbleibende Einträge.
 - Nicht benötigten WebMap-Dienst ausfallen lassen: anderes Thema und Reset bleiben nutzbar, Hinweis erscheint. Betroffenes Thema wird ohne Kartenänderung abgewiesen. Nach Wiederherstellung neu laden.
 - Fehlende Referenz im Dialog: Übernehmen gesperrt; Zuordnen/Entfernen löst die Sperre. Bei Ladefehlern keine Bereinigung, erst Struktur erneut laden.
@@ -48,3 +48,5 @@ Vor Freigabe auf dem Zielsystem prüfen:
 Development enthält die Entwicklungsdateien für den Build auf dem ExB-Server. Erst nach ausdrücklicher Abnahme Version 1.0.0 festlegen, geprüften Commit nach production übernehmen und als Release kennzeichnen. Bestehenden Build und Experience-Konfiguration für Rückfall sichern. Git-Push, Serverbereitstellung und Portal-Abnahme sind getrennte Schritte.
 
 Zusätzliche Abnahme 0.7.2: neuen Dienst hinzufügen, WMS-/WMTS-Vorgaben prüfen, eigene URL überschreiben, Dienst laden und nach Namen/ID filtern. Bestehende Auswahl muss beim Filtern erhalten bleiben.
+
+Versionsanzeige 0.7.3: Der Admin-Einstellungsbereich zeigt die Version des geladenen Widget-Manifests oberhalb der Kartenauswahl.

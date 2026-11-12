@@ -74,5 +74,6 @@ export default {
   "resolveBeforeApply": "Resolve or remove all missing layer references before applying.",
   "filterServiceLayers": "Filter service layers by name or ID",
   "noLayerMatches": "No matching layers. The current selection is retained.",
-  "currentServiceLayer": "current selection"
+  "currentServiceLayer": "current selection",
+  "widgetVersion": "Widget version"
 }

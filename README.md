@@ -2,7 +2,7 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.7.2 — Externe WMS-/WMTS-Dienste pro Thema
+## Stand 0.7.3 — Externe WMS-/WMTS-Dienste pro Thema
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
 „Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Zusätzliche WMS-/WMTS-Layer werden pro Thema konfiguriert, beim Anzeigen eingefügt und bei Themenwechsel oder Reset vollständig entfernt.
@@ -21,7 +21,7 @@ Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus e
 
 Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.7.2 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
+Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.7.3 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
 
 ## Branches
 
@@ -176,3 +176,7 @@ Neue Dienste beginnen mit WMS `https://wms.geo.admin.ch/`. Beim Wechsel auf WMTS
 Nach „Dienst laden“ filtert das neue Textfeld die Layerauswahl nach Name und technischer ID. Mehrere Suchwörter werden kombiniert; Gross-/Kleinschreibung und Akzente werden ignoriert. Der bereits ausgewählte Layer bleibt auch bei einem nicht passenden Filter erhalten und im Auswahlfeld als aktuelle Auswahl verfügbar. Leeren des Suchfelds zeigt wieder alle Layer. Die Suche erfolgt lokal, ohne neue Dienstabfrage pro Eingabe.
 
 Öffentliche WMTS-Capabilities erfolgreich geprüft: REST-Encoding und EPSG:2056-Endpunkt. Regressionen für Standardwechsel, Erhalt eigener URLs und Suche sowie Syntax-/isolierte Typprüfung bestanden. Vollständiger ExB-Build und UI-Abnahme stehen aus.
+
+## Versionsanzeige (0.7.3)
+
+Der Einstellungsbereich zeigt oberhalb der Kartenauswahl die Widget-Version. Der Wert stammt aus `props.manifest.version` des von ExB geladenen Widget-Manifests. Es wird keine separate Versionsnummer in der Experience-Konfiguration gespeichert.

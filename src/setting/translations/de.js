@@ -74,5 +74,6 @@ System.register([], function (_export) { return { execute: function () { _export
   "resolveBeforeApply": "Vor dem Übernehmen alle fehlenden Layerreferenzen zuordnen oder entfernen.",
   "filterServiceLayers": "Dienst-Layer nach Name oder ID filtern",
   "noLayerMatches": "Keine passenden Layer. Die bisherige Auswahl bleibt erhalten.",
-  "currentServiceLayer": "aktuelle Auswahl"
+  "currentServiceLayer": "aktuelle Auswahl",
+  "widgetVersion": "Widget-Version"
 }); } }; });

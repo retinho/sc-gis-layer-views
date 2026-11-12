@@ -52,6 +52,23 @@ assert.equal(new Set(keys).size, keys.length, 'Repeated sublayer IDs in separate
 assert.equal(mapLayers[0].id, 'base-feature', 'Building the tree must not reorder live collections')
 assert.equal(buildLayerTree([{ type: 'group', id: 'empty', layers: collection([]) }])[0].selectable, false)
 assert.equal(buildLayerTree([{ type: 'unsupported', id: 'unsupported' }])[0].selectable, false)
+// Regression: configured WebMaps resolve without a MapView or instanceof check.
+const { resolveConfiguredWebMaps } = await load('../src/setting/configured-webmaps.ts')
+const sources = {
+  map1: { id: 'map1', type: 'WEB_MAP', itemId: 'portal-item-1', portalUrl: 'https://example.org/portal', label: 'Map one' },
+  map2: { id: 'map2', type: 'WEB_MAP', itemId: 'portal-item-2' },
+  scene: { id: 'scene', type: 'WEB_SCENE', itemId: 'scene-item' },
+  child: { id: 'child', type: 'FEATURE_LAYER' }
+}
+assert.deepEqual(resolveConfiguredWebMaps([{ dataSourceId: 'map1' }], sources, 'WEB_MAP'), [
+  { dataSourceId: 'map1', itemId: 'portal-item-1', portalUrl: 'https://example.org/portal', label: 'Map one' }
+])
+assert.equal(resolveConfiguredWebMaps([{ dataSourceId: 'missing', mainDataSourceId: 'map1' }], sources, 'WEB_MAP')[0].itemId, 'portal-item-1')
+assert.equal(resolveConfiguredWebMaps([{ dataSourceId: 'child', rootDataSourceId: 'map1' }], sources, 'WEB_MAP')[0].itemId, 'portal-item-1')
+assert.equal(resolveConfiguredWebMaps([{ dataSourceId: 'map1' }, { dataSourceId: 'map1' }, { dataSourceId: 'map2' }], sources, 'WEB_MAP').length, 2)
+assert.deepEqual(resolveConfiguredWebMaps([{ dataSourceId: 'scene' }], sources, 'WEB_MAP'), [])
+assert.deepEqual(resolveConfiguredWebMaps(undefined, undefined, 'WEB_MAP'), [])
+assert.equal(resolveConfiguredWebMaps([{ dataSourceId: 'map2' }], sources, 'WEB_MAP')[0].label, 'portal-item-2')
 console.log('Layer selection and tree mapping assertions passed.')
 
 await rm(temporaryDirectory, { recursive: true, force: true })

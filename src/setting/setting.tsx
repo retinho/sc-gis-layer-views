@@ -2,23 +2,21 @@
 import { React, jsx, css } from 'jimu-core'
 import { AllWidgetSettingProps } from 'jimu-for-builder'
 import { MapWidgetSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components'
-import { CalciteButton, CalciteInput, CalciteLabel, CalciteLoader } from 'calcite-components'
-import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
-import WebMap from 'esri/WebMap'
+import { CalciteButton, CalciteInput, CalciteLabel, CalciteLoader, CalciteSelect, CalciteOption } from 'calcite-components'
 import { IMConfig } from '../config'
 import { useThemeManagement } from './hooks/useThemeManagement'
 import messages from './translations/default'
 import { useWebMapTree } from './hooks/useWebMapTree'
 import { LayerTree } from './components/layer-tree'
 import { getLeafKeys } from './layer-selection'
+import { useConfiguredWebMaps } from './hooks/useConfiguredWebMaps'
 
 export default function Setting(props: AllWidgetSettingProps<IMConfig>): React.ReactElement {
   const management = useThemeManagement(props)
-  const [binding, setBinding] = React.useState<{ widgetId: string; view: JimuMapView | undefined }>()
   const mapWidgetId = props.useMapWidgetIds?.[0]
-  const view = binding?.widgetId === mapWidgetId ? binding?.view : undefined
-  const map = view?.view?.map
-  const source = map instanceof WebMap ? map : undefined
+  const sources = useConfiguredWebMaps(mapWidgetId)
+  const [selectedSourceId, setSelectedSourceId] = React.useState('')
+  const source = sources.find((entry) => entry.dataSourceId === selectedSourceId) ?? sources[0]
   const tree = useWebMapTree(source)
   const availableKeys = React.useMemo(() => new Set(tree.nodes.flatMap(getLeafKeys)), [tree.nodes])
   const translate = (key: keyof typeof messages): string =>
@@ -28,17 +26,22 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>): React.R
   }
   return (
     <div className="widget-setting-sc-gis-layer-views" css={styles}>
-      {mapWidgetId && <JimuMapViewComponent key={mapWidgetId} useMapWidgetId={mapWidgetId}
-        onActiveViewChange={(active: JimuMapView | undefined) => setBinding({ widgetId: mapWidgetId, view: active })} />}
       <SettingSection title={translate('map')}>
         <SettingRow><MapWidgetSelector useMapWidgetIds={props.useMapWidgetIds} onSelect={selectMap} /></SettingRow>
+        {sources.length > 1 && <CalciteLabel>
+          {translate('webMapSource')}
+          <CalciteSelect label={translate('webMapSource')}
+            onCalciteSelectChange={(event) => setSelectedSourceId(event.target.value)}>
+            {sources.map((entry) => <CalciteOption key={entry.dataSourceId} value={entry.dataSourceId}
+              selected={entry.dataSourceId === source?.dataSourceId}>{entry.label}</CalciteOption>)}
+          </CalciteSelect>
+        </CalciteLabel>}
       </SettingSection>
       <SettingSection title={translate('themes')}>
         <p>{translate('managementHelp')}</p>
         <p>{translate('layerHelp')}</p>
         {!mapWidgetId && <p role="status">{translate('noMap')}</p>}
-        {mapWidgetId && !view && <p role="status">{translate('waitingMap')}</p>}
-        {view && !source && <p role="status">{translate('webMapOnly')}</p>}
+        {mapWidgetId && !source && <p role="status">{translate('webMapOnly')}</p>}
         {tree.status === 'unsupported' && <p role="status">{translate('webMapOnly')}</p>}
         {tree.status === 'loading' && <CalciteLoader inline label={translate('loadingLayers')} />}
         {tree.status === 'error' && <p role="alert">{translate('layerLoadError')}</p>}
@@ -73,6 +76,8 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>): React.R
                   label={`${translate('deleteTheme')}: ${theme.name}`}
                   onClick={() => management.remove(theme.id)}>{translate('deleteTheme')}</CalciteButton>
               </div>
+              <h4 className="layer-selection-heading">{translate('layerSelection')}</h4>
+              {tree.status !== 'ready' && <p role="status">{translate('selectionUnavailable')}</p>}
               {tree.status === 'ready' && (
                 theme.webMapKey && theme.webMapKey !== tree.webMapKey ? (
                   <div>
@@ -118,6 +123,7 @@ const styles = css`
   .theme-actions { display: flex; flex-wrap: wrap; gap: 6px; }
   .tree-action { margin-bottom: 12px; }
   .theme-layer-selection { margin-top: 12px; }
+  .layer-selection-heading { font-size: inherit; margin: 16px 0 8px; }
   .layer-tree, .layer-tree ul { list-style: none; margin: 0; padding: 0; }
   .layer-tree ul { padding-left: 16px; }
   .layer-row { display: flex; align-items: flex-start; gap: 4px; margin: 6px 0; }

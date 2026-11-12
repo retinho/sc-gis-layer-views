@@ -3,11 +3,12 @@ import WebMap from 'esri/WebMap'
 import esriConfig from 'esri/config'
 import type { ILayerNode } from '../layer-selection'
 import { buildLayerTree } from '../build-layer-tree'
+import type { IConfiguredWebMap } from '../configured-webmaps'
 
 type TTreeStatus = 'waiting' | 'loading' | 'ready' | 'error' | 'unsupported'
 
 interface ITreeState {
-  source: WebMap | undefined
+  source: IConfiguredWebMap | undefined
   status: TTreeStatus
   nodes: ILayerNode[]
   webMapKey: string
@@ -17,18 +18,22 @@ interface IWebMapTree extends ITreeState {
   reload: () => void
 }
 
-export function useWebMapTree(source: WebMap | undefined): IWebMapTree {
+export function useWebMapTree(source: IConfiguredWebMap | undefined): IWebMapTree {
   const [revision, setRevision] = React.useState(0)
   const [state, setState] = React.useState<ITreeState>({ source: undefined, status: 'waiting', nodes: [], webMapKey: '' })
   React.useEffect(() => {
-    const portalItem = source?.portalItem
-    if (!portalItem?.id) {
+    if (!source?.itemId) {
       setState({ source, status: source ? 'unsupported' : 'waiting', nodes: [], webMapKey: '' })
       return
     }
     let cancelled = false
     // Independent owned WebMap: read the saved structure, never alter the live map.
-    const saved = new WebMap({ portalItem: portalItem.clone() })
+    const saved = new WebMap({
+      portalItem: {
+        id: source.itemId,
+        portal: { url: source.portalUrl || esriConfig.portalUrl }
+      }
+    })
     setState({ source, status: 'loading', nodes: [], webMapKey: '' })
     const load = async (): Promise<void> => {
       try {

@@ -21,11 +21,14 @@ System.register([], function (_export) { return { execute: function () { _export
   "loadingLayers": "Chargement des couches de la WebMap enregistrée",
   "layerLoadError": "La WebMap ou une couche n’a pas pu être chargée. Vérifiez les accès et réessayez. Les sélections sont conservées.",
   "reloadLayers": "Recharger la structure",
-  "webMapOnly": "Choisissez un widget Carte avec une WebMap 2D enregistrée.",
+  "webMapOnly": "Le widget Carte sélectionné ne contient aucune source WebMap configurée. Vérifiez ses paramètres.",
   "noLayers": "La WebMap ne contient aucune couche opérationnelle.",
   "differentMap": "Ce thème appartient à une autre WebMap. Sa sélection est conservée. Le bouton suivant la remplace par une sélection vide pour cette carte.",
   "useCurrentMap": "Utiliser cette WebMap et vider la sélection",
   "missingLayers": "Certaines couches enregistrées ne figurent plus dans cette WebMap. Leurs références sont conservées.",
   "expandGroup": "Développer le groupe",
-  "collapseGroup": "Réduire le groupe"
+  "collapseGroup": "Réduire le groupe",
+  "webMapSource": "WebMap pour la sélection des couches",
+  "layerSelection": "Sélection des couches",
+  "selectionUnavailable": "L’arborescence apparaîtra ici lorsque la WebMap configurée sera chargée."
 }); } }; });

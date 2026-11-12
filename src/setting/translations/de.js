@@ -21,11 +21,14 @@ System.register([], function (_export) { return { execute: function () { _export
   "loadingLayers": "Layer der gespeicherten WebMap werden geladen",
   "layerLoadError": "Die WebMap oder ein Layer konnte nicht geladen werden. Zugriff prüfen und erneut versuchen. Gespeicherte Auswahlen bleiben erhalten.",
   "reloadLayers": "Layerstruktur neu laden",
-  "webMapOnly": "Bitte ein Karten-Widget mit einer gespeicherten 2D-WebMap wählen.",
+  "webMapOnly": "Das gewählte Karten-Widget enthält keine konfigurierte WebMap-Datenquelle. Bitte seine Karteneinstellungen prüfen.",
   "noLayers": "Die WebMap enthält keine operativen Layer.",
   "differentMap": "Dieses Thema gehört zu einer anderen WebMap. Seine Auswahl bleibt erhalten. Mit dem folgenden Knopf wird sie durch eine leere Auswahl für diese Karte ersetzt.",
   "useCurrentMap": "Aktuelle WebMap verwenden und Auswahl leeren",
   "missingLayers": "Einige gespeicherte Layer fehlen in dieser WebMap. Ihre Verweise bleiben erhalten.",
   "expandGroup": "Gruppe aufklappen",
-  "collapseGroup": "Gruppe zuklappen"
+  "collapseGroup": "Gruppe zuklappen",
+  "webMapSource": "WebMap für die Layerauswahl",
+  "layerSelection": "Layerauswahl",
+  "selectionUnavailable": "Hier erscheint der Layerbaum, sobald die konfigurierte WebMap geladen ist."
 }); } }; });

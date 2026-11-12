@@ -21,11 +21,14 @@ export default {
   "loadingLayers": "Loading saved WebMap layers",
   "layerLoadError": "The WebMap or a layer could not be loaded. Check access and try again. Saved selections are retained.",
   "reloadLayers": "Reload layer structure",
-  "webMapOnly": "Select a map widget with a saved 2D WebMap.",
+  "webMapOnly": "The selected map widget has no configured WebMap data source. Check its map settings.",
   "noLayers": "The WebMap has no operational layers.",
   "differentMap": "This theme belongs to another WebMap. Its selection is retained. Use the button below to replace it with an empty selection for this map.",
   "useCurrentMap": "Use current WebMap and clear selection",
   "missingLayers": "Some saved layers are no longer in this WebMap. Their references are retained.",
   "expandGroup": "Expand group",
-  "collapseGroup": "Collapse group"
+  "collapseGroup": "Collapse group",
+  "webMapSource": "WebMap for layer selection",
+  "layerSelection": "Layer selection",
+  "selectionUnavailable": "The layer tree will appear here once the configured WebMap has loaded."
 }

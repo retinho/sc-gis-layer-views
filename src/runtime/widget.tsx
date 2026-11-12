@@ -41,6 +41,7 @@ export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElem
           {translate('retry')}
         </CalciteButton>}
       </div>}
+      {controller.partial && <p className="status" role="status">{translate('partialMap')}</p>}
       {themes.length === 0 ? <p>{translate('empty')}</p> : (
         <ul className="theme-list">
           {themes.map((theme) => (

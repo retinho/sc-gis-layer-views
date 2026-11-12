@@ -69,5 +69,7 @@ export default {
   "assignReference": "Assign replacement",
   "removeReference": "Remove from theme",
   "moveToRootBottom": "Place service at root bottom",
-  "moveToBottom": "Place service at group bottom"
+  "moveToBottom": "Place service at group bottom",
+  "partialTree": "Some layers could not be loaded. Reconciliation and Apply are blocked to avoid treating unavailable layers as deleted. Restore access and reload the layer structure.",
+  "resolveBeforeApply": "Resolve or remove all missing layer references before applying."
 }

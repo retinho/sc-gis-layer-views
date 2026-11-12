@@ -24,5 +24,7 @@ System.register([], function (_export) { return { execute: function () { _export
   "externalLoadError": "Ein Dienst des Themas konnte nicht geladen werden. Das bisherige Thema bleibt erhalten.",
   "externalPrepareError": "Der Dienst wurde geladen, aber sein gewählter Layer konnte nicht vorbereitet werden. Das bisherige Thema bleibt erhalten.",
   "externalApplyError": "Die Dienst-Layer konnten nicht in der Karte angewendet werden. Das bisherige Thema wurde wiederhergestellt.",
-  "owner": "Eigentümer"
+  "owner": "Eigentümer",
+  "layerUnavailable": "Dieses Thema benötigt einen derzeit nicht verfügbaren Layer oder eine Zielgruppe. Es wurde nichts geändert. Nach Wiederherstellung des Dienstes die Experience neu laden.",
+  "partialMap": "Einige WebMap-Layer konnten nicht geladen werden. Nicht betroffene Themen bleiben nutzbar. Reset stellt bekannte gespeicherte Sichtbarkeiten wieder her und entfernt eigene externe Dienste; Details ausgefallener Layer können unvollständig sein. Nach Wiederherstellung die Experience neu laden."
 }); } }; });

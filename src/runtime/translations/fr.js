@@ -24,5 +24,7 @@ System.register([], function (_export) { return { execute: function () { _export
   "externalLoadError": "Un service du thème n’a pas pu être chargé. Le thème précédent est conservé.",
   "externalPrepareError": "Le service a été chargé, mais sa couche sélectionnée n’a pas pu être préparée. Le thème précédent est conservé.",
   "externalApplyError": "Les couches du service n’ont pas pu être appliquées à la carte. Le thème précédent a été restauré.",
-  "owner": "Propriétaire"
+  "owner": "Propriétaire",
+  "layerUnavailable": "Ce thème utilise une couche ou un groupe indisponible. Aucune modification effectuée. Rechargez l’expérience après le rétablissement du service.",
+  "partialMap": "Certaines couches WebMap sont indisponibles. Les thèmes non concernés restent utilisables. Réinitialiser restaure les visibilités connues et retire les services externes du widget ; les détails des couches indisponibles peuvent être incomplets. Rechargez l’expérience après rétablissement."
 }); } }; });

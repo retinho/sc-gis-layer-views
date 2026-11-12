@@ -63,3 +63,11 @@ Beim Anzeigen wurde der bereits geladene WMS-Unterlayer mit `clone()` kopiert. D
 Der Nutzer meldet erfolgreiches Laden der angebotenen Layer von `https://wms.geo.admin.ch` im Dialog, aber einen Fehler beim Anzeigen. Die öffentlichen Capabilities wurden erfolgreich abgerufen (1068 benannte Layer; EPSG:2056 wird auf Hauptebene angeboten). Der konkrete vom Nutzer ausgewählte Layer und die ursprüngliche Ausnahme sind noch unbekannt; ein vollständiger Nachweis der Ursache in dessen ExB-Umgebung steht aus.
 
 Regression mit fehlendem Extent und absichtlich fehlschlagender Clone-Methode bestanden; Auswahl, Metadatenerhalt, Kindersichtbarkeit, fehlender Layer und Koordinatensystemprüfung getestet. Bestehende Regressionen, Strict-Typprüfung der Dienstlogik gegen SDK 4.32 und Syntaxprüfung bestanden. Fehlertexte unterscheiden jetzt Capabilities-Laden, Layer-Vorbereitung und Kartenanwendung. ExB-Build und Wiederholung des konkreten Nutzerfalls stehen aus.
+
+## Stabilitätskorrekturen 0.7.1
+
+Die Prüfung von 0.7.0 zeigte einen reproduzierbaren Bereinigungsfehler nach einer Verschiebung eigener Layer zwischen Containern, eine globale Sperre bei einzelnen Dienst-Ausfällen und eine fehlende Übernahme-Sperre für veraltete Auswahlen. Diese Punkte sind in 0.7.1 korrigiert.
+
+Die Bereinigung verwendet nun den aktuellen Layer-Container (SDK-parent beziehungsweise rekursive Gruppensuche). Die Ladephase trennt das Laden des WebMap-Items von einzelnen operativen Layern; Fehler werden mit ihrem Pfad erfasst. Eine fehlgeschlagene WebMap selbst bleibt blockierend. Teilweise geladene Strukturen werden nicht als Grundlage für eine endgültige Konfigurationsübernahme zugelassen. Details siehe Bauplan.
+
+Regressionen für verschobene eigene Layer bei Reset/Themenwechsel/Abbau, Rollback an die tatsächliche Position, abgetrennte Gruppen, fehlende Reset-Sublayer und isolierte Ladefehler bestanden. Bestehende Regressionen ebenfalls bestanden. Isolierte Strict-Typprüfung der reinen Logik und SDK-Aufrufe gegen die offiziellen 4.32-Deklarationen sowie Syntaxprüfung aller Quelldateien bestanden. Keine lokale vollständige ExB-Kompilierung oder Browser-Abnahme behauptet.

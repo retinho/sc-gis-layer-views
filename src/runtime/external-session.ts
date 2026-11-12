@@ -53,10 +53,27 @@ export class ExternalSession {
   private readonly factory: TFactory
   constructor(map: ArcGISMap, widgetId: string, factory: TFactory) { this.map = map; this.widgetId = widgetId; this.factory = factory }
 
+  private currentCollection(item: IOwned): Collection<Layer> {
+    const find = (collection: Collection<Layer>): Collection<Layer> | undefined => {
+      if (collection.indexOf(item.layer) >= 0) return collection
+      for (const layer of collection.toArray()) {
+        if (layer.type === 'group') {
+          const found = find((layer as GroupLayer).layers)
+          if (found) return found
+        }
+      }
+      return undefined
+    }
+    const parent = item.layer.parent
+    const parentLayers = parent && 'layers' in parent ? parent.layers as Collection<Layer> : undefined
+    if (parentLayers && parentLayers.indexOf(item.layer) >= 0) return parentLayers
+    return find(this.map.layers) ?? item.collection
+  }
+
   dispose(): void {
     this.disposed = true
     this.generation += 1
-    for (const item of this.owned) { item.collection.remove(item.layer); item.layer.destroy() }
+    for (const item of this.owned) { this.currentCollection(item).remove(item.layer); item.layer.destroy() }
     this.owned = []
   }
 
@@ -66,7 +83,10 @@ export class ExternalSession {
     const entries = theme?.externalLayers ?? []
     if (entries.some((entry) => !isValidExternalLayer(entry)) || new Set(entries.map((entry) => entry.id)).size !== entries.length) throw new Error('invalidService')
     const baseNodes = withoutOwned(collectVisibility(this.map.layers.toArray()), new Set(this.owned.map((item) => item.layer)))
-    const plan = theme ? themeVisibility(baseNodes, theme.selectedLayerKeys ?? []) : defaults
+    const available = snapshotVisibility(baseNodes)
+    // Reset restores all known values still present, even if a failed service omitted sublayers.
+    const plan = theme ? themeVisibility(baseNodes, theme.selectedLayerKeys ?? [])
+      : Object.fromEntries(Object.entries(defaults).filter(([key]) => Object.prototype.hasOwnProperty.call(available, key)))
     const placements = entries.map((entry) => resolvePlacement(this.map, baseNodes, entry))
     entries.forEach((entry, index) => {
       if (entry.visible) placements[index]?.ancestors.forEach((node) => {
@@ -84,7 +104,7 @@ export class ExternalSession {
       return false
     }
     // Re-resolve after async capability requests: another widget may have changed the map.
-    const old = [...this.owned]
+    const old = this.owned.map((item) => ({ ...item, collection: this.currentCollection(item) }))
     const previous = snapshotVisibility(collectVisibility(this.map.layers.toArray()))
     const oldPositions = old.map((item) => ({ ...item, index: item.collection.indexOf(item.layer) }))
     const next: IOwned[] = []

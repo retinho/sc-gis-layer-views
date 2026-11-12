@@ -71,11 +71,3 @@ export function applyVisibility(nodes: readonly IVisibilityNode[], plan: TVisibi
   }
   try { write(plan) } catch (error) { write(before); throw error }
 }
-
-export async function loadOperationalLayers(layers: readonly Layer[]): Promise<void> {
-  await Promise.all(layers.map(async (layer): Promise<void> => {
-    await layer.load()
-    if (layer.type === 'group') await loadOperationalLayers((layer as GroupLayer).layers.toArray())
-    if (layer.type === 'map-image') await (layer as MapImageLayer).loadAll()
-  }))
-}

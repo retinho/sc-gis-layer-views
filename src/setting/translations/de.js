@@ -69,5 +69,7 @@ System.register([], function (_export) { return { execute: function () { _export
   "assignReference": "Ersatz zuordnen",
   "removeReference": "Aus Thema entfernen",
   "moveToRootBottom": "Dienst auf Hauptebene ganz unten platzieren",
-  "moveToBottom": "Dienst innerhalb der Ebene ganz unten platzieren"
+  "moveToBottom": "Dienst innerhalb der Ebene ganz unten platzieren",
+  "partialTree": "Einige Layer konnten nicht geladen werden. Abgleich und Übernehmen sind gesperrt, damit nicht verfügbare Layer nicht als gelöscht behandelt werden. Zugriff wiederherstellen und Layerstruktur neu laden.",
+  "resolveBeforeApply": "Vor dem Übernehmen alle fehlenden Layerreferenzen zuordnen oder entfernen."
 }); } }; });

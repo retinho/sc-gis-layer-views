@@ -49,7 +49,10 @@ export function ThemeEditor({ theme, sources, translate, onApply, onCancel }: IT
     return Boolean(siblings && (!entry.beforeLayerKey || siblings.some((node) => node.key === entry.beforeLayerKey)))
   }
   const invalidServices = (draft.externalLayers ?? []).some((entry) => !isValidExternalLayer(entry) || !validPlacement(entry))
+  const unresolved = (draft.selectedLayerKeys ?? []).some((key) => !available.has(key))
+  const canApply = Boolean(draft.name.trim() && !differentMap && !invalidServices && !unresolved && tree.status === 'ready' && !tree.partial)
   const apply = (): void => {
+    if (!canApply) return
     // A newly configured empty theme is valid: it intentionally hides all operational layers.
     onApply({ ...draft, webMapKey: draft.webMapKey ?? (tree.status === 'ready' ? tree.webMapKey : undefined) })
   }
@@ -91,19 +94,21 @@ export function ThemeEditor({ theme, sources, translate, onApply, onCancel }: IT
           </div> : <div className="layer-section">
             {tree.nodes.length === 0 && <p>{translate('noLayers')}</p>}
             {(draft.selectedLayerKeys ?? []).some((key) => !available.has(key)) && <p role="status">{translate('missingLayers')}</p>}
-            <WebMapReconcile theme={draft} nodes={tree.nodes} translate={translate} onChange={setDraft} />
+            {!tree.partial && <WebMapReconcile theme={draft} nodes={tree.nodes} translate={translate} onChange={setDraft} />}
             <LayerTree nodes={tree.nodes} selected={draft.selectedLayerKeys ?? []}
               expandLabel={translate('expandGroup')} collapseLabel={translate('collapseGroup')} onChange={changeSelection} />
           </div>)}
           {tree.status === 'ready' && !differentMap && <ExternalEditor entries={draft.externalLayers ?? []} nodes={tree.nodes} translate={translate}
             onChange={(externalLayers) => setDraft((current) => ({ ...current, webMapKey: tree.webMapKey, externalLayers }))} />}
+          {tree.partial && <p role="alert">{translate('partialTree')}</p>}
+          {unresolved && tree.status === 'ready' && !tree.partial && <p role="alert">{translate('resolveBeforeApply')}</p>}
           {invalidServices && <p role="alert">{translate('invalidServices')}</p>}
         </div>
         <div className="editor-footer">
           <span>{translate('applyHint')}</span>
           <div className="footer-actions">
             <CalciteButton appearance="outline" kind="neutral" onClick={onCancel}>{translate('cancel')}</CalciteButton>
-            <CalciteButton disabled={!draft.name.trim() || differentMap || invalidServices || tree.status === 'loading'} onClick={apply}>{translate('apply')}</CalciteButton>
+            <CalciteButton disabled={!canApply} onClick={apply}>{translate('apply')}</CalciteButton>
           </div>
         </div>
       </div>

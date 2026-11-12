@@ -287,6 +287,56 @@ assert.equal(rootFallback.externalLayers[0].groupKey, undefined)
 assert.equal(rootFallback.externalLayers[0].beforeLayerKey, undefined)
 assert.equal(rootFallback.externalLayers[0].url, external.url, 'Cleaning placement retains the service')
 assert.equal(referenceIssues({ ...staleTheme, selectedLayerKeys: [] }, [movedGroup]).length, 0, 'New layers must not be auto-selected')
+// Owned layers must be removed from their current container, including on disposal.
+for (const action of ['reset', 'switch', 'dispose']) {
+  const movingSession = new ExternalSession(map, 'moving', async (entry, id) => makeLayer(entry, id))
+  await movingSession.apply({ ...externalTheme, externalLayers: [external] }, savedDefaults)
+  const movedOwned = target.layers.toArray().find((layer) => layer !== originalLayer)
+  target.layers.remove(movedOwned)
+  map.layers.add(movedOwned)
+  if (action === 'dispose') movingSession.dispose()
+  else await movingSession.apply(action === 'reset' ? undefined : { id: 'empty', name: 'Empty', selectedLayerKeys: [] }, savedDefaults)
+  assert.equal(map.layers.toArray().includes(movedOwned), false, action + ' must detach reparented services')
+  assert.equal(movedOwned.destroyed, true)
+  assert.equal(map.layers.toArray().includes(unrelated), true)
+}
+// Rollback after reparenting restores the service to its actual location.
+const reparentRollback = new ExternalSession(map, 'rollback-moved', async (entry, id) => makeLayer(entry, id))
+await reparentRollback.apply({ ...externalTheme, externalLayers: [external] }, savedDefaults)
+const reparented = target.layers.toArray().find((layer) => layer !== originalLayer)
+target.layers.remove(reparented); map.layers.add(reparented)
+const mapBefore = map.layers.toArray()
+const addBefore = target.layers.add
+target.layers.add = () => { throw new Error('cannot insert') }
+await assert.rejects(reparentRollback.apply({ ...externalTheme, externalLayers: [external] }, savedDefaults), /cannot insert/)
+assert.deepEqual(map.layers.toArray(), mapBefore)
+assert.equal(reparented.destroyed, false)
+target.layers.add = addBefore
+// A detached group is still discoverable via the SDK parent reference.
+const detachedParent = { layers: mutableCollection([]) }
+map.layers.remove(reparented); detachedParent.layers.add(reparented); reparented.parent = detachedParent
+reparentRollback.dispose()
+assert.deepEqual(detachedParent.layers.toArray(), [])
+assert.equal(reparented.destroyed, true)
+// Reset must still clean up when an unavailable service has omitted saved sublayers.
+const partialSession = new ExternalSession(map, 'partial', async (entry, id) => makeLayer(entry, id))
+await partialSession.apply({ ...externalTheme, externalLayers: [external] }, savedDefaults)
+await partialSession.apply(undefined, { ...savedDefaults, missingUnavailableChild: { visible: true } })
+assert.deepEqual(target.layers.toArray(), [originalLayer])
+const { loadOperationalLayers, assertThemeAvailable } = await load('../src/shared/layer-loading.ts')
+const failedLayer = { id: 'down', type: 'map-image', load: async () => { throw new Error('offline') } }
+let healthyLoaded = false
+const healthyLayer = { id: 'up', type: 'feature', load: async () => { healthyLoaded = true } }
+const loadGroup = { id: 'container', type: 'group', load: async () => {}, layers: collection([failedLayer, healthyLayer]) }
+const failures = await loadOperationalLayers([loadGroup])
+assert.equal(healthyLoaded, true)
+assert.deepEqual(failures, [pathKey('layer:container', 'layer:down')])
+assert.doesNotThrow(() => assertThemeAvailable([pathKey('layer:container', 'layer:up')], failures))
+assert.throws(() => assertThemeAvailable([pathKey('layer:container', 'layer:down', 'sublayer:0')], failures), /layerUnavailable/)
+assert.doesNotThrow(() => assertThemeAvailable([], failures))
+assert.doesNotThrow(() => assertThemeAvailable([pathKey('layer:container', 'layer:downstream')], failures))
+const failedChildren = { id: 'subfailure', type: 'map-image', load: async () => {}, loadAll: async () => { throw new Error('children unavailable') } }
+assert.deepEqual(await loadOperationalLayers([failedChildren]), [pathKey('layer:subfailure')])
 console.log('Layer selection, visibility, dialog drafts and external-service lifecycle assertions passed.')
 
 await rm(temporaryDirectory, { recursive: true, force: true })

@@ -24,5 +24,7 @@ export default {
   "externalLoadError": "A theme service could not be loaded. The previous theme was retained.",
   "externalPrepareError": "The service loaded, but its selected layer could not be prepared. The previous theme was retained.",
   "externalApplyError": "The service layers could not be applied to the map. The previous theme was restored.",
-  "owner": "Owner"
+  "owner": "Owner",
+  "layerUnavailable": "This theme uses a currently unavailable layer or target group. No changes were made. Reload the Experience after the service recovers.",
+  "partialMap": "Some WebMap layers could not be loaded. Unaffected themes remain available. Reset restores known saved visibility and removes own external services; unavailable layer details may be incomplete. Reload the Experience after recovery."
 }

@@ -2,7 +2,7 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.7.0 — Externe WMS-/WMTS-Dienste pro Thema
+## Stand 0.7.1 — Externe WMS-/WMTS-Dienste pro Thema
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
 „Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Zusätzliche WMS-/WMTS-Layer werden pro Thema konfiguriert, beim Anzeigen eingefügt und bei Themenwechsel oder Reset vollständig entfernt.
@@ -21,7 +21,7 @@ Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus e
 
 Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.7.0 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
+Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.7.1 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
 
 ## Branches
 
@@ -160,3 +160,11 @@ Es werden nur gespeicherte Referenzen geprüft. Neue, bisher nicht ausgewählte 
 Beim Darüberfahren über eine Themenkarte erscheint der Browserhinweis „Eigentümer: …“ mit dem hinterlegten Bestellertext. Bei leerem Feld wird kein Hinweis ausgegeben. Die Bezeichnung ist auf Deutsch, Französisch und Englisch übersetzt.
 
 Abnahme: Layer in der WebMap in eine andere Gruppe verschieben, weiteren ausgewählten Layer entfernen, Dialogstruktur neu laden, Zuordnung/Bereinigung durchführen und zunächst abbrechen; danach erneut öffnen und die Änderungen übernehmen. Anzeigen sowie Reset prüfen. Auch verschobene externe Zielgruppen testen. Eigentümerhinweis mit ausgefülltem und leerem Feld prüfen. Lokale Regressionen und Syntaxprüfung bestanden; vollständiger Build und UI-Abnahme erfolgen in ExB 1.17.
+
+## Stabilitätsrunde 0.7.1
+
+- Reset, Themenwechsel und Abbau entfernen eigene Dienste aus ihrem aktuellen Container, auch nach einer Verschiebung. Rollback berücksichtigt die tatsächliche vorherige Position.
+- Einzelne nicht verfügbare WebMap-Dienste blockieren nicht mehr alle Themen. Nicht betroffene Themen bleiben nutzbar; betroffene Auswahlen oder externe Platzierungsziele werden gezielt abgewiesen. Ein Hinweis erklärt den eingeschränkten Zustand. Reset entfernt eigene Dienste und restauriert die noch zuordenbaren gespeicherten Sichtbarkeiten. Nicht verfügbare Sublayerdetails können nicht vollständig wiederhergestellt werden. Nach Wiederherstellung die Experience neu laden.
+- Der Dialog lässt Übernehmen nur mit vollständig geladener, passender WebMap und gültigen Referenzen zu. Bei Teilausfällen wird der Abgleich gesperrt, damit fehlgeschlagene Ladungen nicht als Löschungen behandelt werden. Nach Wiederherstellung „Layerstruktur neu laden“ wählen.
+
+Die aktualisierte Abnahme- und Freigabeliste steht im [Bauplan](docs/BAUPLAN.md). 0.7.1 wird nur auf development bereitgestellt. Die vollständige Kompilierung und Abnahme in ExB stehen noch aus; keine Produktionsfreigabe.

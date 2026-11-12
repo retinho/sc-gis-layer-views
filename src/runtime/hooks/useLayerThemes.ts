@@ -4,22 +4,26 @@ import WebMap from 'esri/WebMap'
 import esriConfig from 'esri/config'
 import type ArcGISMap from 'esri/Map'
 import type { ILayerTheme } from '../../config'
-import { collectVisibility, snapshotVisibility, loadOperationalLayers } from '../layer-visibility'
+import { collectVisibility, snapshotVisibility } from '../layer-visibility'
 import type { TVisibilitySnapshot } from '../layer-visibility'
 
+import { loadOperationalLayers, assertThemeAvailable } from '../../shared/layer-loading'
 import { ExternalSession } from '../external-session'
 import { createExternalLayer } from '../../shared/external-services'
 
-type TMessage = 'externalPrepareError' | 'externalApplyError' | 'loadingServices' | 'invalidService' | 'serviceProjection' | 'externalTarget' | 'externalLoadError' | 'loadingMap' | 'mapLoadError' | 'wrongMap' | 'missingLayers' | 'unconfiguredTheme' | 'applyError' | 'themeApplied' | 'resetApplied' | null
+type TMessage = 'layerUnavailable' | 'externalPrepareError' | 'externalApplyError' | 'loadingServices' | 'invalidService' | 'serviceProjection' | 'externalTarget' | 'externalLoadError' | 'loadingMap' | 'mapLoadError' | 'wrongMap' | 'missingLayers' | 'unconfiguredTheme' | 'applyError' | 'themeApplied' | 'resetApplied' | null
 interface IPreparedMap {
   view: JimuMapView
   map: ArcGISMap
   key: string
   session: ExternalSession
+  unavailable: string[]
+  partial: boolean
   defaults: TVisibilitySnapshot
 }
 interface ILayerThemes {
   ready: boolean
+  partial: boolean
   message: TMessage
   apply: (theme: ILayerTheme) => void
   reset: () => void
@@ -50,10 +54,12 @@ export function useLayerThemes(view: JimuMapView | undefined, widgetId: string):
           ?? appConfig?.dataSources?.[view.dataSourceId]
         if (metadata?.type !== DataSourceTypes.WebMap || !metadata.itemId) throw new Error('No WebMap data source')
         saved = new WebMap({ portalItem: { id: metadata.itemId, portal: { url: metadata.portalUrl || esriConfig.portalUrl } } })
-        await saved.loadAll()
+        await saved.load()
         const map = view.view.map
         if (!map) throw new Error('No active map')
-        await loadOperationalLayers(map.layers.toArray())
+        const [savedFailures, liveFailures] = await Promise.all([
+          loadOperationalLayers(saved.layers.toArray()), loadOperationalLayers(map.layers.toArray())
+        ])
         const item = saved.portalItem
         if (!item?.id) throw new Error('No WebMap item')
         const key = JSON.stringify([(item.portal?.url ?? esriConfig.portalUrl).replace(/\/$/, ''), item.id])
@@ -61,7 +67,7 @@ export function useLayerThemes(view: JimuMapView | undefined, widgetId: string):
         if (!cancelled) {
           const session = new ExternalSession(map, widgetId, (entry, id) => createExternalLayer(entry, id, view.view.spatialReference))
           active.current = session
-          setPrepared({ view, map, key, defaults, session }); setMessage(null)
+          setPrepared({ view, map, key, defaults, session, unavailable: [...new Set([...savedFailures, ...liveFailures])], partial: savedFailures.length > 0 || liveFailures.length > 0 }); setMessage(null)
         }
       } catch {
         if (!cancelled) setMessage('mapLoadError')
@@ -75,6 +81,10 @@ export function useLayerThemes(view: JimuMapView | undefined, widgetId: string):
     if (!view || !prepared || prepared.view !== view || prepared.map !== view.view.map) return
     if (theme && !theme.webMapKey) { setMessage('unconfiguredTheme'); return }
     if (theme && theme.webMapKey !== prepared.key) { setMessage('wrongMap'); return }
+    if (theme) {
+      try { assertThemeAvailable([...(theme.selectedLayerKeys ?? []), ...(theme.externalLayers ?? []).flatMap((entry) => [entry.groupKey, entry.beforeLayerKey].filter((key): key is string => Boolean(key)))], prepared.unavailable) }
+      catch { setMessage('layerUnavailable'); return }
+    }
     if (running.current) return
     running.current = true
     const session = prepared.session
@@ -90,5 +100,5 @@ export function useLayerThemes(view: JimuMapView | undefined, widgetId: string):
     }).finally(() => { if (active.current === session) { running.current = false; setBusy(false) } })
   }
 
-  return { ready, message, apply: (theme): void => run(theme), reset: (): void => run(), retry: (): void => setRevision((value) => value + 1) }
+  return { ready, partial: Boolean(prepared?.partial), message, apply: (theme): void => run(theme), reset: (): void => run(), retry: (): void => setRevision((value) => value + 1) }
 }

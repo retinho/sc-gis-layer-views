@@ -7,6 +7,12 @@ import { join, basename } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { stripTypeScriptTypes } from 'node:module'
 
+// Framework registration is required even when the widget panel never mounts.
+// Esri SDK resources 1.17, widgets/translation/manifest.json, commit 16ccec0.
+const manifest = JSON.parse(await readFile(new URL('../manifest.json', import.meta.url), 'utf8'))
+assert.deepEqual(manifest.extensions, [{ point: 'APP_CONFIG_PROCESSOR', uri: 'extensions/theme-startup' }])
+await readFile(new URL('../src/' + manifest.extensions[0].uri + '.ts', import.meta.url), 'utf8')
+
 const temporaryDirectory = await mkdtemp(join(tmpdir(), 'layer-views-test-'))
 async function load(relative) {
   const source = await readFile(new URL(relative, import.meta.url), 'utf8')

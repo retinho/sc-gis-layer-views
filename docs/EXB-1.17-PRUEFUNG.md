@@ -74,8 +74,12 @@ Regressionen für verschobene eigene Layer bei Reset/Themenwechsel/Abbau, Rollba
 
 ## Erweiterung 0.8.0: URL-Start
 
-Die Registrierung als `APP_CONFIG_PROCESSOR_EXTENSION` folgt dem offiziellen, versionsgebundenen 1.17-Beispiel `widgets/translation` (weiterhin Referenzcommit `16ccec0c21cfff1cb66e283eacaafc326ed6b95c`). Die [Esri-Dokumentation zu Extension Points](https://developers.arcgis.com/experience-builder/guide/extension-points/) beschreibt die Ausführung nach dem Laden der App-Konfiguration und vor den Widgets. Builder-Ausnahme über `window.jimuConfig.isInBuilder` wie im Beispiel.
+Die seit 0.8.2 korrigierte Registrierung als `APP_CONFIG_PROCESSOR` folgt dem offiziellen, versionsgebundenen 1.17-Beispiel `widgets/translation` (weiterhin Referenzcommit `16ccec0c21cfff1cb66e283eacaafc326ed6b95c`). Die [Esri-Dokumentation zu Extension Points](https://developers.arcgis.com/experience-builder/guide/extension-points/) beschreibt die Ausführung nach dem Laden der App-Konfiguration und vor den Widgets. Builder-Ausnahme über `window.jimuConfig.isInBuilder` wie im Beispiel.
 
 Die aktive Karte wird über Jimu-Redux-MapView-Informationen und `MapViewManager.getJimuMapViewById` gefunden; der 1.17-MapView-Beispielcode verwendet den Manager ebenfalls. Es werden keine Panels geöffnet und keine Standardwidget-Konfigurationen verändert. Der eigene Query-Parameter wird über die Browser-URL-API gelesen; es werden keine nicht dokumentierten Esri-URL-Kommandos erfunden.
 
 Controller-/Beobachter-Regressionen und Syntaxprüfung bestanden. Die isolierte Strict-Prüfung verwendet offizielle SDK-4.32-Typen und eine minimale typisierte JimuMapView-Schnittstelle für die verwendeten View-Felder; dies ist keine vollständige ExB-Typprüfung. Der komplette Build, das Laden der Extension im Enterprise-Portal, die Clipboard-Funktion und das Startverhalten im konkreten Layout bleiben Zielsystem-Abnahmen.
+
+## Nachprüfung 0.8.2: Registrierung des Hintergrundstarts
+
+Direkter Vergleich mit [translation/manifest.json im ExB-1.17-Referenzcommit](https://github.com/Esri/arcgis-experience-builder-sdk-resources/blob/16ccec0c21cfff1cb66e283eacaafc326ed6b95c/widgets/translation/manifest.json) ergab einen falschen Extension-Point-Wert in 0.8.0/0.8.1. Die frühere Aussage zur Übereinstimmung war falsch und wurde oben korrigiert. Richtig ist `APP_CONFIG_PROCESSOR`; `AppConfigProcessorExtension` ist der TypeScript-Interfacename, nicht der Manifestwert. Manifest korrigiert und Regression ergänzt. Die bisherigen isolierten Logiktests konnten diesen Registrierungsfehler nicht erkennen. Vollständige Laufzeitabnahme in ExB bleibt erforderlich.

@@ -2,7 +2,7 @@
   "name": "sc-gis-layer-views",
   "label": "Layer-Themen",
   "type": "widget",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "exbVersion": "1.17.0",
   "author": "SC-GIS",
   "description": "Vordefinierte Layer-Themen für eine verknüpfte WebMap.",
@@ -26,7 +26,7 @@
   ],
   "extensions": [
     {
-      "point": "APP_CONFIG_PROCESSOR_EXTENSION",
+      "point": "APP_CONFIG_PROCESSOR",
       "uri": "extensions/theme-startup"
     }
   ]

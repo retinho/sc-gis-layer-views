@@ -201,3 +201,9 @@ Der Hintergrundstart wartet auf die aktive verknüpfte Karte, ohne das Themenpan
 Die Karte muss auf der aufgerufenen Seite geladen werden und zum Thema passen. Nach zwei Minuten endet die Hintergrundbeobachtung; Öffnen des Themenwidgets ermöglicht den Start nach späterer Kartenbereitschaft. Builder-Bearbeitung bleibt vom automatischen Start ausgenommen. Hinweise zu unbekannten/ungültigen Themen erscheinen im Themenwidget, sobald es geöffnet wird.
 
 Abnahme: Thema speichern/veröffentlichen, URL-Zusatz kopieren und an die Experience-Adresse hängen. Bei standardmässig aktiver Layer-Liste muss das Thema starten, ohne das Themenpanel zu öffnen. Danach Reset und manuelle Auswahl prüfen. Ohne Parameter muss die WebMap unverändert starten.
+
+## Korrektur URL-Hintergrundstart (0.8.2)
+
+Der Erweiterungspunkt im Manifest ist auf den Esri-Wert `APP_CONFIG_PROCESSOR` korrigiert. In 0.8.0/0.8.1 verhinderte der falsche Wert die Registrierung; das URL-Thema startete erst beim Öffnen des Panels.
+
+Beim Update den vollständigen Widget-Ordner inklusive `manifest.json` ersetzen, den ExB-Client neu starten und neu kompilieren. Die Experience danach speichern/veröffentlichen und im Browser vollständig neu laden. Mit `?thema=<ID>` und geschlossenem Themenpanel testen; die normale Layer-Liste kann geöffnet bleiben. Bei bereitgestelltem Widget auch dort den vollständigen Build ersetzen. Admin-Versionsanzeige: 0.8.2. Development-Teststand, keine Produktionsfreigabe.

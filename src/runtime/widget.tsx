@@ -15,14 +15,18 @@ export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElem
     props.intl.formatMessage({ id: key, defaultMessage: messages[key] })
   const headingId = `${props.id}-themes`
   const statusId = `${props.id}-status`
+  const styles = React.useMemo(() => getStyles(props.theme), [props.theme])
+  const onActiveViewChange = React.useCallback((view: JimuMapView | undefined): void => {
+    setMapView(view)
+  }, [])
 
   return (
-    <section className="widget-sc-gis-layer-views" css={styles} aria-labelledby={headingId}>
-      {mapWidgetId && <JimuMapViewComponent useMapWidgetId={mapWidgetId} onActiveViewChange={setMapView} />}
+    <section className="jimu-widget widget-sc-gis-layer-views" css={styles} aria-labelledby={headingId}>
+      {mapWidgetId && <JimuMapViewComponent key={mapWidgetId} useMapWidgetId={mapWidgetId} onActiveViewChange={onActiveViewChange} />}
       <Row className="theme-heading align-items-center m-0">
         <Col className="p-0"><h2 id={headingId}>{translate('themes')}</h2></Col>
         <Col xs="auto" className="p-0">
-          <CalciteButton appearance="transparent" kind="neutral" disabled title={translate('foundation')}>
+          <CalciteButton className="reset-themes" appearance="transparent" kind="neutral" disabled title={translate('foundation')}>
             {translate('reset')}
           </CalciteButton>
         </Col>
@@ -38,7 +42,7 @@ export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElem
                 <Col className="theme-name p-0">{theme.name}</Col>
                 <Col xs="auto" className="p-0">
                   <CalciteButton className="show-theme" kind="neutral" disabled
-                    aria-label={`${translate('show')}: ${theme.name}`} aria-describedby={statusId}>
+                    label={`${translate('show')}: ${theme.name}`} aria-describedby={statusId}>
                     {translate('show')}
                   </CalciteButton>
                 </Col>
@@ -51,25 +55,34 @@ export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElem
   )
 }
 
-const styles = css`
-  height: 100%; overflow: auto; padding: 20px;
-  color: var(--sys-color-on-surface, #333);
-  background: var(--sys-color-surface, #fff);
-  font-family: inherit;
-  .theme-heading { padding-bottom: 16px; border-bottom: 1px solid var(--sys-color-outline, #a0a0a0); }
+// These theme fields are present in Esri's version-pinned 1.17 demo theme.
+function getStyles(theme: AllWidgetProps<IMConfig>['theme']): ReturnType<typeof css> {
+  return css`
+  height: 100%; box-sizing: border-box; overflow: auto; padding: 20px;
+  color: ${theme?.body?.color ?? '#333'};
+  background: ${theme?.surfaces?.[1]?.bg ?? '#fff'};
+  font-family: ${theme?.body?.fontFamily ?? 'inherit'};
+  .theme-heading { padding-bottom: 16px; border-bottom: 1px solid ${theme?.border?.color ?? '#a0a0a0'}; }
   h2 { margin: 0; font-size: 24px; font-weight: 400; line-height: 1.3; }
   .status { margin: 14px 0; font-size: 13px; }
   .theme-list { margin: 0; padding: 0; list-style: none; }
   .theme-card {
     padding: 10px; margin-bottom: 10px;
-    border: 1px solid var(--sys-color-outline, #a0a0a0);
+    border: 1px solid ${theme?.border?.color ?? '#a0a0a0'};
     box-shadow: 0 1px 6px rgb(0 0 0 / 14%);
   }
   .theme-name { min-width: 0; overflow-wrap: anywhere; font-size: 17px; font-weight: 600; margin-right: 12px; }
-  .show-theme { width: 112px; --calcite-color-foreground-1: #484848; --calcite-color-text-1: #fff; }
+  .reset-themes { --calcite-button-text-color: ${theme?.body?.color ?? '#333'}; }
+  .show-theme {
+    width: 112px;
+    --calcite-button-background-color: #484848;
+    --calcite-button-text-color: #fff;
+    --calcite-button-corner-radius: 0;
+  }
   @media (max-width: 360px) {
     padding: 12px;
     .theme-name { font-size: 15px; }
     .show-theme { width: 88px; }
   }
 `
+}

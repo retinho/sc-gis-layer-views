@@ -2,7 +2,7 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.1.0 — Grundgerüst
+## Stand 0.1.1 — Grundgerüst
 
 Enthalten: Karten-Widget-Auswahl, Kartenanbindung, lokalisierte Oberfläche, Themenkarten-Komponente und leere Standardkonfiguration.
 Noch nicht enthalten: Admin-Themenverwaltung, Layerbaum, Themenaktivierung, Reset und externe Dienste. Anzeigen und Reset sind deshalb bewusst deaktiviert. Es werden keine Kartendaten oder Sichtbarkeiten verändert.
@@ -32,3 +32,7 @@ Dieser erste Zwischenstand ist **nicht produktionsreif**. Ein Build und eine vis
 Fachliche Festlegungen: [Bauplan](docs/BAUPLAN.md).
 
 Technische Referenzen: [Kartenbindung](https://developers.arcgis.com/experience-builder/guide/use-map-widget-in-widget/), [Calcite in ExB](https://www.esri.com/arcgis-blog/products/experience-builder/developers/optimizing-custom-widgets-in-arcgis-experience-builder-with-jimu-ui-calcite-and-map-components).
+
+## Prüfung gegen Esri 1.17
+
+Quellenvergleich und Korrekturen sind im [Prüfbericht](docs/EXB-1.17-PRUEFUNG.md) dokumentiert. Als feste Referenz dienen die offiziellen Esri-Beispiele im Branch `1.17`, Commit `16ccec0c21cfff1cb66e283eacaafc326ed6b95c`. Die mit ExB gelieferten Bibliotheken unverändert verwenden; keine aktuelle Calcite-/React-Version separat installieren.

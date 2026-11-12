@@ -2,7 +2,7 @@ import { React } from 'jimu-core'
 import { AllWidgetSettingProps } from 'jimu-for-builder'
 import { MapWidgetSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components'
 import { IMConfig } from '../config'
-import messages from '../runtime/translations/default'
+import messages from './translations/default'
 
 export default function Setting(props: AllWidgetSettingProps<IMConfig>): React.ReactElement {
   const translate = (key: keyof typeof messages): string =>

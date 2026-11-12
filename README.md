@@ -2,7 +2,7 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.8.3 — Externe WMS-/WMTS-Dienste pro Thema
+## Stand 0.8.4 — Externe WMS-/WMTS-Dienste pro Thema
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
 „Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Zusätzliche WMS-/WMTS-Layer werden pro Thema konfiguriert, beim Anzeigen eingefügt und bei Themenwechsel oder Reset vollständig entfernt.
@@ -21,7 +21,7 @@ Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus e
 
 Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.8.3 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
+Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.8.4 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
 
 ## Branches
 
@@ -215,3 +215,11 @@ Beim Update den vollständigen Widget-Ordner inklusive `manifest.json` ersetzen,
 Quelle: [Esri WidgetManifestProperties](https://developers.arcgis.com/experience-builder/api-reference/jimu-core/WidgetManifestProperties/) und SDK-Loader im offiziellen ExB-1.17-Beispiel `widgets/add-layers`. Regressionen prüfen private Chunks sowie Reihenfolge und Fehlerweitergabe beim Start. Ohne Zugriff auf den ausgelieferten Build und die Portal-Konsole ist die konkrete verbleibende Fehlerursache nicht abschliessend nachgewiesen.
 
 Deployment: vollständigen Produktionsbuild des Widgets einschliesslich `chunks`, `extensions` und Manifest auf den Widget-Webserver übertragen. Experience speichern/veröffentlichen, Browsercache umgehen und URL-Thema bei geschlossenem Themenpanel prüfen. Falls es weiterhin nicht startet: Browserkonsole und Netzwerkfehler vor dem Öffnen des Panels prüfen (fehlendes Erweiterungsmodul, fehlender Chunk, SDK-Fehler). Vollständiger ExB-Build und Portal-Laufzeitabnahme stehen aus. Keine Produktionsfreigabe.
+
+## Portal-Chunkpfad korrigiert (0.8.4)
+
+Die Portal-Konsole aus der Abnahme von 0.8.3 belegt: Der Config-Processor läuft, aber der dynamische Import von `url-startup` fordert seinen Chunk unter `/portal/apps/experiencebuilder/cdn/378/widgets/sc-gis-layer-views/chunks/` an. Dort antwortet der Server mit 404/HTML; daraus folgen MIME-Fehler und ChunkLoadError. `notShareDynamicModules` allein korrigiert diesen Lade-Basispfad nicht.
+
+Der Startimport nutzt jetzt `webpackMode: "eager"`: Laufzeitcode wird im Erweiterungsbundle mitgeliefert und erst nach SDK-Bereitschaft ausgeführt. Für diesen Import gibt es keinen separaten Chunk-Request mehr. Siehe [Webpack import modes](https://webpack.js.org/api/module-methods/#webpackmode). Keine Änderung von Portal-Dateien oder MIME-Konfiguration nötig.
+
+Abnahme: vollständig neu bauen und Widget auf dem Webserver ersetzen, Cache umgehen, URL-Thema mit geschlossenem Panel starten. Im Netzwerk darf kein Request für `sc-gis-layer-views_src_runtime_url-startup_ts.js` mehr entstehen. Danach Anzeigen/Reset prüfen. Lokale Regressionen ersetzen keinen vollständigen ExB-Build oder Portal-Test; Produktionsfreigabe steht weiterhin aus.

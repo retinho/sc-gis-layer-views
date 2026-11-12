@@ -22,7 +22,9 @@ export default class ThemeStartup implements extensionSpec.AppConfigProcessorExt
     // The extension runs before widget dependencies have necessarily loaded.
     void bootThemeStartup(
       () => loadArcGISJSAPIModules(['esri/WebMap']),
-      () => import('../runtime/url-startup'),
+      // Bundle locally, but execute only after the SDK loader has resolved.
+      // Portal-hosted extensions otherwise resolve lazy chunks against the Portal CDN.
+      () => import(/* webpackMode: "eager" */ '../runtime/url-startup'),
       (runtime) => runtime.startUrlTheme(this.widgetId, mapWidgetId, theme)
     ).catch((error: unknown) => {
       console.error('[sc-gis-layer-views] URL theme background startup failed', error)

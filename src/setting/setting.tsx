@@ -58,6 +58,18 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>): React.R
 }
 
 const styles = css`
+  /* Use the surrounding Builder text color, independently of the app theme.
+     Calcite's shadow DOM otherwise keeps its default light-mode text color. */
+  calcite-label {
+    color: inherit;
+    --calcite-label-text-color: currentColor;
+  }
+  .theme-actions calcite-button[kind="neutral"] {
+    color: inherit;
+    --calcite-button-text-color: currentColor;
+    --calcite-button-border-color: currentColor;
+    --calcite-button-background-color: transparent;
+  }
   .theme-editors { padding: 0; margin: 16px 0 0; list-style: none; }
   .theme-editor { padding: 12px 0; border-top: 1px solid currentColor; }
   .theme-actions { display: flex; flex-wrap: wrap; gap: 6px; }

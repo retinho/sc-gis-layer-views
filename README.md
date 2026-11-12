@@ -2,7 +2,7 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.2.0 — Grundgerüst
+## Stand 0.2.1 — Grundgerüst
 
 Enthalten: Karten-Widget-Auswahl, Kartenanbindung, lokalisierte Oberfläche, Themenkarten-Komponente und leere Standardkonfiguration.
 Noch nicht enthalten: Layerbaum, Themenaktivierung, Reset und externe Dienste. Anzeigen und Reset sind deshalb bewusst deaktiviert. Es werden keine Kartendaten oder Sichtbarkeiten verändert.
@@ -44,3 +44,9 @@ Namen und Reihenfolge werden in der Widget-Konfiguration gespeichert und direkt 
 Abnahme: Mehrere Themen anlegen und umbenennen, mittleres Thema duplizieren und entfernen, erste/letzte Position sortieren, Experience speichern und neu laden. Einstellungen und Themenkarten muessen uebereinstimmen. Anzeigen und Reset bleiben deaktiviert; die Karte wird nicht veraendert.
 
 Das Grundgeruest 0.1.1 wurde vom Nutzer in ExB ohne sichtbare Fehler bestaetigt. Fuer 0.2.0 steht der Build in ExB 1.17 noch aus.
+
+## Korrektur 0.2.1
+
+Die neutralen Verwaltungsbuttons und das Label des Themennamens erben jetzt die Textfarbe des Builder-Einstellungsbereichs. Dadurch verwenden sie im dunklen Builder nicht mehr die dunkle Calcite-Standardtextfarbe. Deaktivierte Sortierbuttons bleiben deaktiviert und werden weiterhin von Calcite abgeschwaecht. Die rote Loeschen-Aktion bleibt erhalten.
+
+Vom Nutzer bestaetigt: Themenverwaltung 0.2.0 funktioniert; Kontrastfehler im dunklen Builder gemeldet. 0.2.1 lokal auf JSON und Diff geprueft; visuelle Abnahme in ExB steht aus.

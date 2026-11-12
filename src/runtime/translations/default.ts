@@ -26,5 +26,8 @@ export default {
   "externalApplyError": "The service layers could not be applied to the map. The previous theme was restored.",
   "owner": "Owner",
   "layerUnavailable": "This theme uses a currently unavailable layer or target group. No changes were made. Reload the Experience after the service recovers.",
-  "partialMap": "Some WebMap layers could not be loaded. Unaffected themes remain available. Reset restores known saved visibility and removes own external services; unavailable layer details may be incomplete. Reload the Experience after recovery."
+  "partialMap": "Some WebMap layers could not be loaded. Unaffected themes remain available. Reset restores known saved visibility and removes own external services; unavailable layer details may be incomplete. Reload the Experience after recovery.",
+  "invalidThemeLink": "The theme URL parameter is invalid. The map was not changed.",
+  "urlThemeMissing": "The linked theme no longer exists. The map was not changed.",
+  "waitingUrlMap": "The linked map was not ready within two minutes. Open this widget when the map is available, or reload the Experience."
 }

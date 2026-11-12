@@ -352,6 +352,95 @@ assert.deepEqual(filterServiceLayers(searchable, 'foret'), [searchable[1]])
 assert.deepEqual(filterServiceLayers(searchable, 'example.eaux'), [searchable[0]])
 assert.deepEqual(filterServiceLayers(searchable, 'missing'), [])
 assert.deepEqual(filterServiceLayers(searchable, ''), searchable)
+// Deep links use stable IDs, preserve app identifiers, and reject ambiguous parameters.
+const { createThemeLink, readThemeRequest, suggestExperienceUrl } = await load('../src/shared/theme-link.ts')
+const directLink = createThemeLink('https://portal.example.org/portal/apps/experiencebuilder/experience/?id=abc&locale=de#widget_1=foo:bar', 'widget_2', 'theme-123')
+assert.deepEqual(readThemeRequest(directLink), { widgetId: 'widget_2', themeId: 'theme-123' })
+assert.equal(new URL(directLink).searchParams.get('id'), 'abc')
+assert.equal(new URL(directLink).hash, '#widget_1=foo:bar')
+assert.equal(readThemeRequest('https://example.org/app/'), undefined)
+assert.throws(() => readThemeRequest('https://example.org/?sc-layer-theme=bad'), /invalidThemeLink/)
+assert.throws(() => readThemeRequest('https://example.org/?sc-layer-theme=widget_2:theme-123&sc-layer-theme=duplicate'), /invalidThemeLink/)
+assert.throws(() => createThemeLink('javascript:alert(1)', 'widget_2', 'theme-123'), /invalidThemeLink/)
+assert.throws(() => createThemeLink('https://example.org/builder/?id=1', 'widget_2', 'theme-123'), /invalidThemeLink/)
+assert.equal(suggestExperienceUrl('https://portal.example.org/portal/apps/experiencebuilder/builder/?id=abc&token=secret'), 'https://portal.example.org/portal/apps/experiencebuilder/experience/?id=abc')
+assert.equal(suggestExperienceUrl('https://localhost:3001/?id=12'), 'https://localhost:3001/experience/12/')
+// Actual shared controller: delayed readiness, one-time start, Reset, remount and manual selection.
+const { ThemeController } = await load('../src/runtime/theme-controller-state.ts')
+const settle = async () => { await Promise.resolve(); await Promise.resolve(); await Promise.resolve() }
+const calls = []
+let releasePreparation
+let disposeCount = 0
+let destroyHandle
+const controllerMap = {}
+const controllerView = { view: { map: controllerMap, destroyed: false, addHandles: (handle) => { destroyHandle = handle } } }
+const preparedForTest = { view: controllerView, map: controllerMap, key: 'map-key', defaults: {}, unavailable: [], partial: false, session: { apply: async (theme) => { calls.push(theme?.id ?? 'reset'); return true }, dispose: () => { disposeCount++ } } }
+const runtimeController = new ThemeController('widget_2', async () => new Promise((resolve) => { releasePreparation = resolve }))
+const urlTheme = { id: 'url-theme', name: 'Renamable', webMapKey: 'map-key', selectedLayerKeys: [] }
+runtimeController.setView(controllerView)
+runtimeController.start(urlTheme)
+assert.equal(runtimeController.hasStarted(), false)
+assert.equal(calls.length, 0)
+releasePreparation(preparedForTest)
+await settle()
+runtimeController.start(urlTheme)
+await settle()
+assert.deepEqual(calls, ['url-theme'])
+runtimeController.setView(controllerView)
+runtimeController.start({ ...urlTheme, name: 'Renamed' })
+runtimeController.reset()
+await settle()
+runtimeController.start(urlTheme)
+assert.deepEqual(calls, ['url-theme', 'reset'], 'Opening panel again or Reset must not reapply URL theme')
+runtimeController.apply({ ...urlTheme, id: 'manual' })
+await settle()
+assert.deepEqual(calls, ['url-theme', 'reset', 'manual'])
+destroyHandle.remove()
+assert.equal(disposeCount, 1)
+assert.equal(runtimeController.getSnapshot().ready, false)
+const unknownController = new ThemeController('widget_2', async () => preparedForTest)
+unknownController.start(undefined)
+assert.equal(unknownController.getSnapshot().message, 'urlThemeMissing')
+assert.equal(calls.length, 3)
+const manualFirst = new ThemeController('widget_2', async () => preparedForTest)
+manualFirst.setView(controllerView); await settle(); manualFirst.reset(); await settle(); manualFirst.start(urlTheme)
+assert.deepEqual(calls, ['url-theme', 'reset', 'manual', 'reset'], 'Manual action consumes the pending URL start')
+// Background observer activates without a mounted widget and releases subscriptions.
+const { observeStartup } = await load('../src/runtime/startup-observer.ts')
+const previousWindow = globalThis.window
+const pageListeners = new Set()
+const pageEvents = { addEventListener: (_type, callback) => pageListeners.add(callback), removeEventListener: (_type, callback) => pageListeners.delete(callback) }
+globalThis.window = pageEvents
+let availableView
+let notifyView
+let unsubscribeCount = 0
+const backgroundCalls = []
+const backgroundPrepared = { ...preparedForTest, session: { apply: async (theme) => { backgroundCalls.push(theme?.id ?? 'reset'); return true }, dispose: () => {} } }
+const backgroundController = new ThemeController('widget_2', async () => backgroundPrepared)
+const stopBackground = observeStartup(backgroundController, urlTheme, () => availableView, (listener) => { notifyView = listener; return () => { unsubscribeCount++ } })
+try {
+  assert.deepEqual(backgroundCalls, [])
+  availableView = controllerView; notifyView(); await settle()
+  assert.deepEqual(backgroundCalls, ['url-theme'])
+  assert.equal(unsubscribeCount, 1)
+  assert.equal(pageListeners.size, 0)
+  notifyView(); await settle()
+  assert.deepEqual(backgroundCalls, ['url-theme'])
+  backgroundController.reset(); await settle()
+  assert.deepEqual(backgroundCalls, ['url-theme', 'reset'])
+} finally { stopBackground(); globalThis.window = previousWindow }
+// Slow preparation after changing maps must dispose the obsolete session.
+let resolveObsolete
+let obsoleteDisposed = false
+const obsoleteController = new ThemeController('widget_2', async (view) => view === controllerView ? new Promise((resolve) => { resolveObsolete = resolve }) : { ...backgroundPrepared, view, map: view.view.map })
+const newerView = { view: { map: {}, destroyed: false, addHandles: () => {} } }
+obsoleteController.setView(controllerView)
+obsoleteController.setView(newerView)
+await settle()
+resolveObsolete({ ...preparedForTest, session: { dispose: () => { obsoleteDisposed = true } } })
+await settle()
+assert.equal(obsoleteDisposed, true)
+assert.equal(obsoleteController.getSnapshot().ready, true)
 console.log('Layer selection, visibility, dialog drafts and external-service lifecycle assertions passed.')
 
 await rm(temporaryDirectory, { recursive: true, force: true })

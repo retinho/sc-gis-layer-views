@@ -5,6 +5,8 @@ import { Row, Col } from 'jimu-ui'
 import { CalciteButton, CalciteLoader } from 'calcite-components'
 import { IMConfig } from '../config'
 import messages from './translations/default'
+import { readThemeRequest } from '../shared/theme-link'
+import { getThemeController } from './theme-controller'
 import { useLayerThemes } from './hooks/useLayerThemes'
 
 export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElement {
@@ -13,6 +15,16 @@ export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElem
   const themes = props.config?.themes ?? []
   const currentView = mapView?.mapWidgetId === mapWidgetId ? mapView : undefined
   const controller = useLayerThemes(currentView, props.id)
+  React.useEffect(() => {
+    if (window.jimuConfig.isInBuilder || !controller.ready) return
+    const runtime = getThemeController(props.id)
+    try {
+      const request = readThemeRequest(window.location.href)
+      if (!request || request.widgetId !== props.id) return
+      const selected = themes.find((entry) => entry.id === request.themeId)
+      runtime.start(selected ? { ...selected, selectedLayerKeys: Array.from(selected.selectedLayerKeys ?? []), externalLayers: Array.from(selected.externalLayers ?? []).map((entry) => ({ ...entry })) } : undefined)
+    } catch { runtime.invalidLink() }
+  }, [controller.ready, props.id, themes])
   const translate = (key: keyof typeof messages): string =>
     props.intl.formatMessage({ id: key, defaultMessage: messages[key] })
   const headingId = `${props.id}-themes`

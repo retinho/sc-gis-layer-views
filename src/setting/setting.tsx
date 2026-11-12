@@ -2,14 +2,16 @@
 import { React, jsx, css } from 'jimu-core'
 import { AllWidgetSettingProps } from 'jimu-for-builder'
 import { MapWidgetSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components'
-import { CalciteButton } from 'calcite-components'
+import { CalciteButton, CalciteInput, CalciteLabel } from 'calcite-components'
 import { IMConfig } from '../config'
 import { useThemeManagement } from './hooks/useThemeManagement'
 import messages from './translations/default'
 import { useConfiguredWebMaps } from './hooks/useConfiguredWebMaps'
+import { suggestExperienceUrl } from '../shared/theme-link'
 import { ThemeEditor } from './components/theme-editor'
 
 export default function Setting(props: AllWidgetSettingProps<IMConfig>): React.ReactElement {
+  const experienceUrl = props.config.publicExperienceUrl ?? suggestExperienceUrl(window.location.href)
   const management = useThemeManagement(props)
   const mapWidgetId = props.useMapWidgetIds?.[0]
   const sources = useConfiguredWebMaps(mapWidgetId)
@@ -26,6 +28,11 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>): React.R
       <p className="widget-version">{translate('widgetVersion')}: {props.manifest.version}</p>
       <SettingSection title={translate('map')}>
         <SettingRow><MapWidgetSelector useMapWidgetIds={props.useMapWidgetIds} onSelect={selectMap} /></SettingRow>
+      </SettingSection>
+      <SettingSection title={translate('themeLinks')}>
+        <CalciteLabel>{translate('experienceUrl')}<CalciteInput type="url" value={experienceUrl}
+          onCalciteInputInput={(event) => props.onSettingChange({ id: props.id, config: props.config.set('publicExperienceUrl', event.target.value) })} /></CalciteLabel>
+        <p>{translate('experienceUrlHelp')}</p>
       </SettingSection>
       <SettingSection title={translate('themes')}>
         <p>{translate('managementHelp')}</p>
@@ -55,7 +62,7 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>): React.R
           ))}
         </ol>
       </SettingSection>
-      {editingTheme && <ThemeEditor key={`${mapWidgetId}-${editingTheme.id}`} theme={editingTheme} sources={sources} translate={translate}
+      {editingTheme && <ThemeEditor key={`${mapWidgetId}-${editingTheme.id}`} theme={editingTheme} widgetId={props.id} experienceUrl={experienceUrl} sources={sources} translate={translate}
         onCancel={() => setEditingId(undefined)} onApply={(draft) => { management.updateTheme(draft); setEditingId(undefined) }} />}
     </div>
   )

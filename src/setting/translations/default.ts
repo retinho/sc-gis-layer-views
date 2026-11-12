@@ -75,5 +75,14 @@ export default {
   "filterServiceLayers": "Filter service layers by name or ID",
   "noLayerMatches": "No matching layers. The current selection is retained.",
   "currentServiceLayer": "current selection",
-  "widgetVersion": "Widget version"
+  "widgetVersion": "Widget version",
+  "themeLinks": "Theme links",
+  "experienceUrl": "Published Experience URL",
+  "experienceUrlHelp": "Check the suggested address. For a separately hosted app, enter its public URL.",
+  "themeLink": "Theme link",
+  "copyThemeLink": "Copy theme link",
+  "themeLinkHelp": "The link uses this theme’s permanent ID. Apply changes, save and publish the Experience before sharing.",
+  "invalidExperienceUrl": "Enter a valid Experience URL in the widget settings (not a Builder URL).",
+  "linkCopied": "Theme link copied.",
+  "linkCopyFailed": "Copying failed. Copy the link from the field manually."
 }

@@ -26,5 +26,8 @@ System.register([], function (_export) { return { execute: function () { _export
   "externalApplyError": "Les couches du service n’ont pas pu être appliquées à la carte. Le thème précédent a été restauré.",
   "owner": "Propriétaire",
   "layerUnavailable": "Ce thème utilise une couche ou un groupe indisponible. Aucune modification effectuée. Rechargez l’expérience après le rétablissement du service.",
-  "partialMap": "Certaines couches WebMap sont indisponibles. Les thèmes non concernés restent utilisables. Réinitialiser restaure les visibilités connues et retire les services externes du widget ; les détails des couches indisponibles peuvent être incomplets. Rechargez l’expérience après rétablissement."
+  "partialMap": "Certaines couches WebMap sont indisponibles. Les thèmes non concernés restent utilisables. Réinitialiser restaure les visibilités connues et retire les services externes du widget ; les détails des couches indisponibles peuvent être incomplets. Rechargez l’expérience après rétablissement.",
+  "invalidThemeLink": "Le paramètre de thème est invalide. La carte n’a pas été modifiée.",
+  "urlThemeMissing": "Le thème lié n’existe plus. La carte n’a pas été modifiée.",
+  "waitingUrlMap": "La carte liée n’était pas prête après deux minutes. Ouvrez ce widget lorsque la carte est disponible ou rechargez l’expérience."
 }); } }; });

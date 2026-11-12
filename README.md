@@ -2,7 +2,7 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.7.3 — Externe WMS-/WMTS-Dienste pro Thema
+## Stand 0.8.0 — Externe WMS-/WMTS-Dienste pro Thema
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
 „Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Zusätzliche WMS-/WMTS-Layer werden pro Thema konfiguriert, beim Anzeigen eingefügt und bei Themenwechsel oder Reset vollständig entfernt.
@@ -21,7 +21,7 @@ Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus e
 
 Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.7.3 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
+Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.8.0 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
 
 ## Branches
 
@@ -114,7 +114,7 @@ Prüfung: Syntaxprüfung und Logiktests inklusive unabhängiger Entwürfe, Abbre
 
 Im Standard-Kartenlayer-Widget die Anzeige **zur Laufzeit hinzugefügter Layer** aktivieren. ExB 1.17 bietet diese Option; eine fest konfigurierte Layerauswahl kann neue Dienste ansonsten ausblenden.
 
-Der Experience-Start bleibt unverändert. „Anzeigen“ lädt zunächst alle konfigurierten Dienste. Schlägt ein Dienst fehl, bleibt das bisherige Thema bestehen. Beim Themenwechsel werden dessen Dienste vollständig entfernt; Reset entfernt alle Dienste dieser Widget-Instanz und stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Kartenausschnitt und Zoom bleiben unverändert. Andere Widgets hinzugefügte Layer werden nicht gelöscht. Beim Wechsel der verknüpften Karte oder Abbau der Widget-Instanz werden eigene Dienste ebenfalls entfernt.
+Der Experience-Start bleibt unverändert. „Anzeigen“ lädt zunächst alle konfigurierten Dienste. Schlägt ein Dienst fehl, bleibt das bisherige Thema bestehen. Beim Themenwechsel werden dessen Dienste vollständig entfernt; Reset entfernt alle Dienste dieser Widget-Instanz und stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Kartenausschnitt und Zoom bleiben unverändert. Andere Widgets hinzugefügte Layer werden nicht gelöscht. Beim Wechsel der verknüpften Karte oder Zerstören der Kartenansicht werden eigene Dienste ebenfalls entfernt. Das Schliessen des Themenpanels allein entfernt sie nicht.
 
 Die Dienstadresse muss aus dem Browser erreichbar sein und dessen Zugriff erlauben (HTTPS, CORS, gegebenenfalls Anmeldung). Es werden keine separaten Zugangsdaten im Widget gespeichert. Bei WMTS wird ein nicht passendes Kachelraster mit einer Meldung abgelehnt; die Karte wird nicht auf ein anderes Koordinatensystem umgestellt.
 
@@ -180,3 +180,25 @@ Nach „Dienst laden“ filtert das neue Textfeld die Layerauswahl nach Name und
 ## Versionsanzeige (0.7.3)
 
 Der Einstellungsbereich zeigt oberhalb der Kartenauswahl die Widget-Version. Der Wert stammt aus `props.manifest.version` des von ExB geladenen Widget-Manifests. Es wird keine separate Versionsnummer in der Experience-Konfiguration gespeichert.
+
+## Themenstart per URL (0.8.0)
+
+Das Widget unterstützt den eigenen Query-Parameter `sc-layer-theme=<Widget-ID>:<Themen-ID>`, beispielsweise:
+
+```text
+https://portal.example.org/portal/apps/experiencebuilder/experience/?id=APP_ID&sc-layer-theme=widget_12:theme-abc123
+```
+
+Im Einstellungsbereich unter „Themenlinks“ die URL der veröffentlichten Experience prüfen. Für Portal-Builder-Adressen und die übliche Developer-Edition-Adresse wird eine Laufzeitadresse vorgeschlagen. Bei eigener Hosting-Adresse diese einmal eintragen; ein automatisches Erkennen des späteren IIS-Zielpfads ist nicht möglich. Im Themendialog zeigt „Themenlink“ den vollständigen Link; „Themenlink kopieren“ kopiert ihn. Bei gesperrter Zwischenablage kann das Feld manuell kopiert werden. Änderungen zuerst übernehmen, Experience speichern und veröffentlichen. Links zu noch nicht veröffentlichten Themen funktionieren in der veröffentlichten App noch nicht.
+
+Die IDs bleiben beim Umbenennen erhalten; Duplizieren erzeugt eine eigene Themen-ID. Löschen und neu Anlegen erzeugt einen neuen Link. Vorhandene App-ID, Sprache und weitere Parameter einer explizit eingetragenen Zieladresse bleiben erhalten. In automatisch vorgeschlagenen Adressen werden Builder- und Authentifizierungsparameter nicht übernommen.
+
+Eine `APP_CONFIG_PROCESSOR_EXTENSION` startet die Logik unabhängig davon, ob das Themenpanel geöffnet wurde. Die standardmässig geöffnete Layer-Liste bleibt geöffnet. Sobald die aktive Ansicht des verknüpften Kartenwidgets bereit ist, wird das verlinkte Thema einmalig angewendet – einschliesslich externer Dienste, ohne Kameraänderung. Die Karte muss auf der aufgerufenen Seite tatsächlich geladen werden. Bei mehreren WebMaps muss die aktive Karte zum Thema passen; der Link schaltet nicht selbst auf eine andere WebMap um.
+
+Ohne Parameter erfolgt keine automatische Aktivierung. Ein unbekanntes Thema oder eine falsche Karte führt zu einem Hinweis im Themenwidget und keiner Sichtbarkeitsänderung. Ein nicht geladenes Themenpanel zeigt diesen Hinweis erst beim Öffnen. Builder-Bearbeitung wird vom automatischen Start ausgenommen. Nach zwei Minuten endet die Hintergrundbeobachtung; Öffnen des Themenwidgets erlaubt den Start nach späterer Kartenbereitschaft. Ladefehler werden wie bei „Anzeigen“ behandelt; ein fehlgeschlagener Aktivierungsversuch wird nicht endlos wiederholt.
+
+Ein späteres Öffnen des Panels, Reset oder ein manueller Themenwechsel aktiviert den Link nicht erneut. Die URL bleibt erhalten: Ein vollständiges Neuladen der Experience startet erneut mit dem verlinkten Thema. Die gemeinsame Laufzeitverwaltung bindet ihre Bereinigung an die Kartenansicht; das Schliessen eines Panels entfernt keine Dienste. Änderungen des URL-Parameters innerhalb derselben geladenen Seite lösen bewusst keinen weiteren Start aus.
+
+Abnahme: veröffentlichte Experience über kopierten Link öffnen, während standardmässig die Layer-Liste aktiv ist. Theme-Layer und externe Dienste müssen ohne Öffnen des Themenpanels erscheinen. Danach Themenpanel öffnen, Reset ausführen und manuell wechseln; keine erneute URL-Aktivierung. Ohne Parameter unveränderten Start prüfen. Zusätzlich unbekannte Themen-ID, verzögerte Karte, umbenanntes Thema, Zugriff als normaler Benutzer und selbst gehostete Zieladresse prüfen.
+
+Lokale Regressionen umfassen Linkerzeugung, Portal-/Developer-Adressen, ungültige und doppelte Parameter, verspätete Kartenbereitschaft, Hintergrundstart ohne Panel, einmalige Ausführung, Reset/manuelle Auswahl, Beobachterbereinigung und verworfene Kartenladevorgänge. Vollständiger ExB-Build, Portal-Extension-Laden und Browser-Zwischenablage müssen auf dem Zielsystem geprüft werden.

@@ -1,6 +1,6 @@
 # Vereinbarter Bauplan und Abnahmestand
 
-Stand: 0.7.3 auf development, 12. November 2026. Ziel: Experience Builder Developer Edition 1.17, ArcGIS Enterprise 11.5. Keine Produktionsfreigabe erteilt.
+Stand: 0.8.0 auf development, 12. November 2026. Ziel: Experience Builder Developer Edition 1.17, ArcGIS Enterprise 11.5. Keine Produktionsfreigabe erteilt.
 
 ## Umgesetzte Funktionen
 
@@ -35,7 +35,7 @@ Lokale Regressionen prüfen Sichtbarkeit, Gruppenmodi, Entwürfe, Abgleich, Plat
 
 Vor Freigabe auf dem Zielsystem prüfen:
 
-- 0.7.3 kompilieren; bestehende gespeicherte Experience öffnen, speichern und neu laden.
+- 0.8.0 kompilieren; bestehende gespeicherte Experience öffnen, speichern und neu laden.
 - Eigenen Dienst in eine andere Gruppe/Hauptebene verschieben; Reset und Themenwechsel ohne zurückbleibende Einträge.
 - Nicht benötigten WebMap-Dienst ausfallen lassen: anderes Thema und Reset bleiben nutzbar, Hinweis erscheint. Betroffenes Thema wird ohne Kartenänderung abgewiesen. Nach Wiederherstellung neu laden.
 - Fehlende Referenz im Dialog: Übernehmen gesperrt; Zuordnen/Entfernen löst die Sperre. Bei Ladefehlern keine Bereinigung, erst Struktur erneut laden.
@@ -50,3 +50,14 @@ Development enthält die Entwicklungsdateien für den Build auf dem ExB-Server. 
 Zusätzliche Abnahme 0.7.2: neuen Dienst hinzufügen, WMS-/WMTS-Vorgaben prüfen, eigene URL überschreiben, Dienst laden und nach Namen/ID filtern. Bestehende Auswahl muss beim Filtern erhalten bleiben.
 
 Versionsanzeige 0.7.3: Der Admin-Einstellungsbereich zeigt die Version des geladenen Widget-Manifests oberhalb der Kartenauswahl.
+
+## Erweiterung 0.8.0: Startthema und Teilen
+
+- Eigener URL-Parameter mit stabiler Widget-/Themen-ID; ohne Parameter unveränderter Start.
+- Start über AppConfigProcessor im Hintergrund, auch bei geschlossener Themenansicht und standardmässig aktiver Layer-Liste.
+- Einmalige Anwendung nach Bereitschaft der aktiven verknüpften Karte; kein erneutes Anwenden nach Reset oder manueller Auswahl. Ein neuer Seitenaufruf wertet den Parameter erneut aus.
+- Gemeinsame Laufzeitverwaltung für Hintergrund und Panel, damit Reset auch automatisch hinzugefügte Dienste kennt. Bereinigung beim Kartenwechsel/Zerstören der View; Panels dürfen geschlossen werden, ohne das Thema zu entfernen.
+- Editierbare öffentliche Experience-URL im Einstellungsbereich, „Themenlink kopieren“ und manuell kopierbares Feld im Dialog. Links greifen auf gespeicherte/veröffentlichte Konfiguration zu, nicht auf den noch offenen Dialogentwurf.
+- Ungültige oder nicht passende Themen verändern die Karte nicht. Hinweise werden im Themenwidget angezeigt. Hintergrund wartet höchstens zwei Minuten auf die Karte; bei späterem Laden kann das Themenwidget geöffnet werden.
+
+Die in der README beschriebene Abnahme mit geschlossenem Themenpanel, Portal-Anmeldung und veröffentlichtem Link ist vor Produktionsfreigabe zusätzlich erforderlich.

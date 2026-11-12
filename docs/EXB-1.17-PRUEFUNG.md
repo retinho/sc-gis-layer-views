@@ -71,3 +71,11 @@ Die Prüfung von 0.7.0 zeigte einen reproduzierbaren Bereinigungsfehler nach ein
 Die Bereinigung verwendet nun den aktuellen Layer-Container (SDK-parent beziehungsweise rekursive Gruppensuche). Die Ladephase trennt das Laden des WebMap-Items von einzelnen operativen Layern; Fehler werden mit ihrem Pfad erfasst. Eine fehlgeschlagene WebMap selbst bleibt blockierend. Teilweise geladene Strukturen werden nicht als Grundlage für eine endgültige Konfigurationsübernahme zugelassen. Details siehe Bauplan.
 
 Regressionen für verschobene eigene Layer bei Reset/Themenwechsel/Abbau, Rollback an die tatsächliche Position, abgetrennte Gruppen, fehlende Reset-Sublayer und isolierte Ladefehler bestanden. Bestehende Regressionen ebenfalls bestanden. Isolierte Strict-Typprüfung der reinen Logik und SDK-Aufrufe gegen die offiziellen 4.32-Deklarationen sowie Syntaxprüfung aller Quelldateien bestanden. Keine lokale vollständige ExB-Kompilierung oder Browser-Abnahme behauptet.
+
+## Erweiterung 0.8.0: URL-Start
+
+Die Registrierung als `APP_CONFIG_PROCESSOR_EXTENSION` folgt dem offiziellen, versionsgebundenen 1.17-Beispiel `widgets/translation` (weiterhin Referenzcommit `16ccec0c21cfff1cb66e283eacaafc326ed6b95c`). Die [Esri-Dokumentation zu Extension Points](https://developers.arcgis.com/experience-builder/guide/extension-points/) beschreibt die Ausführung nach dem Laden der App-Konfiguration und vor den Widgets. Builder-Ausnahme über `window.jimuConfig.isInBuilder` wie im Beispiel.
+
+Die aktive Karte wird über Jimu-Redux-MapView-Informationen und `MapViewManager.getJimuMapViewById` gefunden; der 1.17-MapView-Beispielcode verwendet den Manager ebenfalls. Es werden keine Panels geöffnet und keine Standardwidget-Konfigurationen verändert. Der eigene Query-Parameter wird über die Browser-URL-API gelesen; es werden keine nicht dokumentierten Esri-URL-Kommandos erfunden.
+
+Controller-/Beobachter-Regressionen und Syntaxprüfung bestanden. Die isolierte Strict-Prüfung verwendet offizielle SDK-4.32-Typen und eine minimale typisierte JimuMapView-Schnittstelle für die verwendeten View-Felder; dies ist keine vollständige ExB-Typprüfung. Der komplette Build, das Laden der Extension im Enterprise-Portal, die Clipboard-Funktion und das Startverhalten im konkreten Layout bleiben Zielsystem-Abnahmen.

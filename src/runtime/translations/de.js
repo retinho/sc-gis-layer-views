@@ -26,5 +26,8 @@ System.register([], function (_export) { return { execute: function () { _export
   "externalApplyError": "Die Dienst-Layer konnten nicht in der Karte angewendet werden. Das bisherige Thema wurde wiederhergestellt.",
   "owner": "Eigentümer",
   "layerUnavailable": "Dieses Thema benötigt einen derzeit nicht verfügbaren Layer oder eine Zielgruppe. Es wurde nichts geändert. Nach Wiederherstellung des Dienstes die Experience neu laden.",
-  "partialMap": "Einige WebMap-Layer konnten nicht geladen werden. Nicht betroffene Themen bleiben nutzbar. Reset stellt bekannte gespeicherte Sichtbarkeiten wieder her und entfernt eigene externe Dienste; Details ausgefallener Layer können unvollständig sein. Nach Wiederherstellung die Experience neu laden."
+  "partialMap": "Einige WebMap-Layer konnten nicht geladen werden. Nicht betroffene Themen bleiben nutzbar. Reset stellt bekannte gespeicherte Sichtbarkeiten wieder her und entfernt eigene externe Dienste; Details ausgefallener Layer können unvollständig sein. Nach Wiederherstellung die Experience neu laden.",
+  "invalidThemeLink": "Der Themenparameter der URL ist ungültig. Die Karte wurde nicht verändert.",
+  "urlThemeMissing": "Das verlinkte Thema existiert nicht mehr. Die Karte wurde nicht verändert.",
+  "waitingUrlMap": "Die verknüpfte Karte war innerhalb von zwei Minuten nicht bereit. Dieses Widget öffnen, sobald die Karte verfügbar ist, oder die Experience neu laden."
 }); } }; });

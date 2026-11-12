@@ -69,6 +69,54 @@ assert.equal(resolveConfiguredWebMaps([{ dataSourceId: 'map1' }, { dataSourceId:
 assert.deepEqual(resolveConfiguredWebMaps([{ dataSourceId: 'scene' }], sources, 'WEB_MAP'), [])
 assert.deepEqual(resolveConfiguredWebMaps(undefined, undefined, 'WEB_MAP'), [])
 assert.equal(resolveConfiguredWebMaps([{ dataSourceId: 'map2' }], sources, 'WEB_MAP')[0].label, 'portal-item-2')
+// Visibility application uses live layer objects while reset uses a saved snapshot.
+const { collectVisibility, snapshotVisibility, themeVisibility, applyVisibility } = await load('../src/runtime/layer-visibility.ts')
+const v1 = { ...feature('one'), visible: true }
+const v2 = { ...feature('two'), visible: false }
+const nested = { type: 'group', id: 'nested', visible: false, visibilityMode: 'inherited', layers: collection([v2]) }
+const vg = { type: 'group', id: 'group', visible: true, visibilityMode: 'exclusive', layers: collection([v1, nested]) }
+const other = { ...feature('other'), visible: true }
+const live = collectVisibility([vg, other])
+const defaults = snapshotVisibility(live)
+const selectedKey = JSON.stringify(['layer:group', 'layer:nested', 'layer:two'])
+applyVisibility(live, themeVisibility(live, [selectedKey]))
+assert.equal(vg.visible, true)
+assert.equal(nested.visible, true)
+assert.equal(v2.visible, true)
+assert.equal(v1.visible, false)
+assert.equal(other.visible, false)
+assert.equal(vg.visibilityMode, 'independent')
+assert.equal(nested.visibilityMode, 'independent')
+// Manual changes are allowed, and clicking Show again restores the theme.
+v1.visible = true
+applyVisibility(live, themeVisibility(live, [selectedKey]))
+assert.equal(v1.visible, false)
+applyVisibility(live, defaults)
+assert.deepEqual(snapshotVisibility(live), defaults)
+applyVisibility(live, themeVisibility(live, []))
+assert.equal(vg.visible, false)
+assert.equal(other.visible, false)
+applyVisibility(live, defaults)
+const beforeMissing = snapshotVisibility(live)
+assert.throws(() => themeVisibility(live, ['missing']), /missingLayers/)
+assert.deepEqual(snapshotVisibility(live), beforeMissing)
+assert.throws(() => applyVisibility(live, { ...defaults, missing: { visible: true } }), /missingLayers/)
+assert.deepEqual(snapshotVisibility(live), beforeMissing)
+// Sublayers use the same keys as the administrator tree.
+const svc = service('service'); svc.visible = true
+const serviceNodes = collectVisibility([svc])
+const serviceKey = buildLayerTree([svc]).flatMap(getLeafKeys)[0]
+const servicePlan = themeVisibility(serviceNodes, [serviceKey])
+assert.equal(servicePlan[serviceNodes[0].key].visible, true)
+assert.equal(servicePlan[serviceKey].visible, true)
+// A one-time setter failure rolls back all preceding changes.
+let throwOnce = true
+let failureValue = false
+const failingTarget = { get visible() { return failureValue }, set visible(value) { if (throwOnce) { throwOnce = false; throw new Error('setter failed') } failureValue = value } }
+const rollbackNodes = [{ key: 'first', target: { visible: false }, children: [] }, { key: 'failure', target: failingTarget, children: [] }]
+assert.throws(() => applyVisibility(rollbackNodes, { first: { visible: true }, failure: { visible: true } }), /setter failed/)
+assert.equal(rollbackNodes[0].target.visible, false)
+assert.equal(failureValue, false)
 console.log('Layer selection and tree mapping assertions passed.')
 
 await rm(temporaryDirectory, { recursive: true, force: true })

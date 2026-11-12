@@ -7,5 +7,14 @@ System.register([], function (_export) { return { execute: function () { _export
   "noMap": "Veuillez choisir une carte dans les paramètres du widget.",
   "waitingMap": "En attente de la carte associée.",
   "empty": "Aucun thème configuré.",
-  "foundation": "L’activation des thèmes et la réinitialisation suivront."
+  "foundation": "L’activation des thèmes et la réinitialisation suivront.",
+  "loadingMap": "Chargement de la visibilité enregistrée de la WebMap…",
+  "mapLoadError": "La WebMap enregistrée ou ses couches n’ont pas pu être chargées. Vérifiez les accès et réessayez.",
+  "wrongMap": "Ce thème appartient à une autre WebMap. Affichez d’abord la carte correspondante.",
+  "missingLayers": "Des couches configurées sont absentes. Aucune modification effectuée. Vérifiez le thème et la WebMap.",
+  "unconfiguredTheme": "Sélectionnez et enregistrez d’abord les couches de ce thème dans les paramètres.",
+  "applyError": "La visibilité des couches n’a pas pu être modifiée.",
+  "themeApplied": "Thème affiché.",
+  "resetApplied": "Visibilité enregistrée de la WebMap restaurée.",
+  "retry": "Réessayer"
 }); } }; });

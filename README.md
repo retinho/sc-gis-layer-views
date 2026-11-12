@@ -2,10 +2,10 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.3.1 — Layerauswahl pro Thema
+## Stand 0.4.0 — Themen anzeigen und Reset
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
-Noch nicht enthalten: Themenaktivierung, Reset und externe Dienste. Anzeigen und Reset sind deshalb bewusst deaktiviert. Es werden keine Kartendaten oder Sichtbarkeiten verändert.
+„Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Die Konfiguration zusätzlicher externer Dienste folgt als nächster Schritt.
 
 ## Herunterladen und installieren
 
@@ -21,7 +21,7 @@ Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus e
 
 Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Dieser Zwischenstand ist **nicht produktionsreif**. Build und visuelle Abnahme von 0.3.1 in ExB 1.17 stehen aus; lokal ist kein vollständiges ExB-SDK installiert. Die Vorgängerversion 0.2.1 wurde vom Nutzer als funktionierend bestätigt.
+Dieser Zwischenstand ist **nicht produktionsreif**. Build und visuelle Abnahme von 0.4.0 in ExB 1.17 stehen aus; lokal ist kein vollständiges ExB-SDK installiert. Der Nutzer hat den Layerbaum und die Auswahl aus 0.3.1 bestätigt.
 
 ## Branches
 
@@ -41,7 +41,7 @@ Quellenvergleich und Korrekturen sind im [Prüfbericht](docs/EXB-1.17-PRUEFUNG.m
 
 Namen und Reihenfolge werden in der Widget-Konfiguration gespeichert und direkt in den Themenkarten angezeigt. Duplizieren erzeugt eine eigene ID und setzt die Kopie hinter das Original. Sortieren erfolgt mit Nach oben / Nach unten. Leere Namen sind beim Bearbeiten erlaubt und sollten vor dem Speichern ausgefuellt werden.
 
-Abnahme: Mehrere Themen anlegen und umbenennen, mittleres Thema duplizieren und entfernen, erste/letzte Position sortieren, Experience speichern und neu laden. Einstellungen und Themenkarten muessen uebereinstimmen. Anzeigen und Reset bleiben deaktiviert; die Karte wird nicht veraendert.
+Abnahme der Verwaltung: Mehrere Themen anlegen und umbenennen, mittleres Thema duplizieren und entfernen, erste/letzte Position sortieren, Experience speichern und neu laden. Einstellungen und Themenkarten müssen übereinstimmen. Änderungen an der Themenkonfiguration allein schalten keine Kartenlayer um.
 
 Das Grundgerüst 0.1.1 und die Themenverwaltung wurden vom Nutzer in ExB als funktionierend bestätigt.
 
@@ -75,4 +75,20 @@ Der Nutzer meldete in 0.3.0 trotz ausgewaehlter Karte die Aufforderung, eine ges
 
 Grundlagen im offiziellen Esri-Branch 1.17: [Builder-Konfiguration lesen](https://github.com/Esri/arcgis-experience-builder-sdk-resources/blob/16ccec0c21cfff1cb66e283eacaafc326ed6b95c/widgets/message-subscriber/src/actions/query-action-setting.tsx), [ReactRedux.useSelector](https://github.com/Esri/arcgis-experience-builder-sdk-resources/blob/16ccec0c21cfff1cb66e283eacaafc326ed6b95c/widgets/control-the-widget-state/src/runtime/widget.tsx), [DataSource-Metadaten](https://github.com/Esri/arcgis-experience-builder-sdk-resources/blob/16ccec0c21cfff1cb66e283eacaafc326ed6b95c/widgets/data-source-widgets/server-side-output/src/setting/setting.tsx).
 
-Abnahme: Bestehende Experience mit ausgewaehltem Karten-Widget oeffnen. Unter einem Thema muss der Bereich Layerauswahl nach dem Laden den Baum zeigen. Eine aktive Kartenansicht ist dafuer nicht erforderlich. Der ExB-Build und diese visuelle Kontrolle stehen fuer 0.3.1 noch aus.
+Der Nutzer hat bestätigt, dass in 0.3.1 der Layerbaum erscheint und Layer ausgewählt werden können.
+
+## Themen anzeigen und Reset 0.4.0
+
+- Änderungen im Einstellungsbereich werden sofort in die aktuelle Builder-Konfiguration übernommen. Die Experience danach speichern und für die öffentliche Anwendung veröffentlichen.
+- Beim Start werden nur die gespeicherten Standardwerte geladen. Die Karte wird nicht automatisch umgeschaltet.
+- „Anzeigen“ aktiviert alle ausgewählten Layer und ihre übergeordneten Gruppen und deaktiviert die übrigen operativen Layer. MapImageLayer-Unterlayer werden einzeln berücksichtigt. Die Basemap bleibt unverändert.
+- Gruppen werden für eine Themenauswahl auf unabhängige Sichtbarkeit gestellt, damit auch bisher exklusive oder geerbte Gruppen mehrere individuell gewählte Kinder zulassen. Reset stellt zusätzlich zu den Sichtbarkeiten die gespeicherten Gruppenmodi wieder her.
+- Manuelle Änderungen im Standard-Layerlisten-Widget sind weiterhin möglich. Erneutes „Anzeigen“ stellt die konfigurierte Auswahl wieder her.
+- Reset verwendet die beim Laden separat aus dem Portal gelesene WebMap, keinen Snapshot der möglicherweise schon manuell geänderten Laufzeitkarte.
+- Kartenausschnitt, Massstab, Kamera und Zoom werden weder gesetzt noch angefahren.
+- Falsche WebMap-Zuordnung, noch unkonfigurierte Themen oder fehlende benötigte Layer führen zu einer Meldung statt einer Teil-Umschaltung. Bei einem Schreibfehler wird die vorherige Sichtbarkeit wiederherzustellen versucht.
+- Zusätzliche WMS-/WMTS-Dienste werden in diesem Stand noch nicht hinzugefügt. Ihre Entfernung bei Themenwechsel/Reset folgt zusammen mit dieser Funktion. Fremde, von anderen Widgets hinzugefügte Layer werden durch Reset nicht gelöscht.
+
+Lokale Prüfung: Syntaxprüfung aller 14 TS-/TSX-Dateien sowie Logiktests für Gruppen, Unterlayer, Themenwechsel, leere Auswahl, wiederholtes Anzeigen, Reset einschliesslich Gruppenmodi, fehlende Layer und Rücknahme nach einem Schreibfehler erfolgreich. Kein vollständiger ExB-SDK-Build.
+
+Abnahme in ExB: Zwei unterschiedliche Themen anzeigen, Sichtbarkeit in Karte und Standard-Layerliste vergleichen, einen Layer dort manuell ändern und dasselbe Thema erneut anzeigen. Danach Reset mit den gespeicherten WebMap-Defaults vergleichen. Währenddessen müssen Kartenausschnitt und Zoom gleich bleiben. Auch ein Thema mit verschachtelten Gruppen und Map-Service-Unterlayern prüfen.

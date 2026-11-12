@@ -7,5 +7,14 @@ System.register([], function (_export) { return { execute: function () { _export
   "noMap": "Bitte Karte in den Widget-Einstellungen wählen.",
   "waitingMap": "Warten auf die verknüpfte Karte.",
   "empty": "Noch keine Themen konfiguriert.",
-  "foundation": "Themenaktivierung und Reset folgen in den nächsten Schritten."
+  "foundation": "Themenaktivierung und Reset folgen in den nächsten Schritten.",
+  "loadingMap": "Gespeicherte WebMap-Sichtbarkeit wird geladen …",
+  "mapLoadError": "Die gespeicherte WebMap oder ihre Layer konnten nicht geladen werden. Zugriff prüfen und erneut versuchen.",
+  "wrongMap": "Dieses Thema gehört zu einer anderen WebMap. Bitte zuerst zur zugehörigen Karte wechseln.",
+  "missingLayers": "Konfigurierte Layer fehlen. Es wurde nichts verändert. Bitte Thema und WebMap prüfen.",
+  "unconfiguredTheme": "Bitte zuerst die Layer für dieses Thema in den Widget-Einstellungen auswählen und speichern.",
+  "applyError": "Die Layer-Sichtbarkeit konnte nicht geändert werden.",
+  "themeApplied": "Thema angezeigt.",
+  "resetApplied": "Gespeicherte WebMap-Sichtbarkeit wiederhergestellt.",
+  "retry": "Erneut versuchen"
 }); } }; });

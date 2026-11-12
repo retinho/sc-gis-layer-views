@@ -7,5 +7,14 @@ export default {
   "noMap": "Please select a map in the widget settings.",
   "waitingMap": "Waiting for the connected map.",
   "empty": "No themes configured yet.",
-  "foundation": "Theme activation and reset will follow in the next steps."
+  "foundation": "Theme activation and reset will follow in the next steps.",
+  "loadingMap": "Loading saved WebMap visibility…",
+  "mapLoadError": "The saved WebMap or its layers could not be loaded. Check access and try again.",
+  "wrongMap": "This theme belongs to a different WebMap. Switch to its map first.",
+  "missingLayers": "Some configured layers are missing. No changes were made. Check the theme and WebMap.",
+  "unconfiguredTheme": "Choose and save the layers for this theme in the widget settings first.",
+  "applyError": "The layer visibility could not be changed.",
+  "themeApplied": "Theme applied.",
+  "resetApplied": "Saved WebMap visibility restored.",
+  "retry": "Try again"
 }

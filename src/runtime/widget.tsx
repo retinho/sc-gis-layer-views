@@ -2,15 +2,17 @@
 import { React, jsx, css, AllWidgetProps } from 'jimu-core'
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
 import { Row, Col } from 'jimu-ui'
-import { CalciteButton } from 'calcite-components'
+import { CalciteButton, CalciteLoader } from 'calcite-components'
 import { IMConfig } from '../config'
 import messages from './translations/default'
+import { useLayerThemes } from './hooks/useLayerThemes'
 
-// Step 1 deliberately does not mutate map visibility or add external layers.
 export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElement {
   const [mapView, setMapView] = React.useState<JimuMapView | undefined>()
   const mapWidgetId = props.useMapWidgetIds?.[0]
   const themes = props.config?.themes ?? []
+  const currentView = mapView?.mapWidgetId === mapWidgetId ? mapView : undefined
+  const controller = useLayerThemes(currentView)
   const translate = (key: keyof typeof messages): string =>
     props.intl.formatMessage({ id: key, defaultMessage: messages[key] })
   const headingId = `${props.id}-themes`
@@ -26,14 +28,19 @@ export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElem
       <Row className="theme-heading align-items-center m-0">
         <Col className="p-0"><h2 id={headingId}>{translate('themes')}</h2></Col>
         <Col xs="auto" className="p-0">
-          <CalciteButton className="reset-themes" appearance="transparent" kind="neutral" disabled title={translate('foundation')}>
+          <CalciteButton className="reset-themes" appearance="transparent" kind="neutral"
+            disabled={!controller.ready} onClick={controller.reset}>
             {translate('reset')}
           </CalciteButton>
         </Col>
       </Row>
-      <p id={statusId} className="status" role="status">
-        {!mapWidgetId ? translate('noMap') : !mapView ? translate('waitingMap') : translate('foundation')}
-      </p>
+      {(!mapWidgetId || !currentView || controller.message) && <div id={statusId} className="status" role="status">
+        {controller.message === 'loadingMap' && <CalciteLoader inline label={translate('loadingMap')} />}
+        {!mapWidgetId ? translate('noMap') : !currentView ? translate('waitingMap') : controller.message ? translate(controller.message) : null}
+        {controller.message === 'mapLoadError' && <CalciteButton appearance="outline" kind="neutral" onClick={controller.retry}>
+          {translate('retry')}
+        </CalciteButton>}
+      </div>}
       {themes.length === 0 ? <p>{translate('empty')}</p> : (
         <ul className="theme-list">
           {themes.map((theme) => (
@@ -41,8 +48,9 @@ export default function Widget(props: AllWidgetProps<IMConfig>): React.ReactElem
               <Row className="align-items-center m-0">
                 <Col className="theme-name p-0">{theme.name}</Col>
                 <Col xs="auto" className="p-0">
-                  <CalciteButton className="show-theme" kind="neutral" disabled
-                    label={`${translate('show')}: ${theme.name}`} aria-describedby={statusId}>
+                  <CalciteButton className="show-theme" kind="neutral" disabled={!controller.ready}
+                    onClick={() => controller.apply({ ...theme, selectedLayerKeys: Array.from(theme.selectedLayerKeys ?? []) })}
+                    label={`${translate('show')}: ${theme.name}`}>
                     {translate('show')}
                   </CalciteButton>
                 </Col>

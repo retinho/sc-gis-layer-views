@@ -7,6 +7,8 @@ import { readServiceLayers } from '../../shared/external-services'
 import type { IServiceLayerOption } from '../../shared/external-services'
 import { isValidServiceUrl } from '../../shared/external-config'
 
+import { SERVICE_DEFAULTS, changeServiceType, filterServiceLayers } from '../service-options'
+
 type TTranslate = (key: keyof typeof messages) => string
 interface IExternalEditorProps {
   entries: readonly IExternalLayer[]
@@ -21,10 +23,11 @@ interface IExternalRowProps {
   onChange: (entry: IExternalLayer) => void
 }
 function ExternalRow({ entry, nodes, translate, onChange }: IExternalRowProps): React.ReactElement {
+  const [query, setQuery] = React.useState('')
   const [options, setOptions] = React.useState<IServiceLayerOption[]>([])
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'error' | 'empty'>('idle')
   const generation = React.useRef(0)
-  React.useEffect(() => { generation.current += 1; setOptions([]); setStatus('idle'); return (): void => { generation.current += 1 } }, [entry.url, entry.type, entry.serviceMode])
+  React.useEffect(() => { generation.current += 1; setOptions([]); setQuery(''); setStatus('idle'); return (): void => { generation.current += 1 } }, [entry.url, entry.type, entry.serviceMode])
   const load = async (): Promise<void> => {
     const request = ++generation.current
     setStatus('loading')
@@ -40,12 +43,13 @@ function ExternalRow({ entry, nodes, translate, onChange }: IExternalRowProps): 
   }
   visit(nodes, '')
   const siblings = entry.groupKey ? groups.find(({ node }) => node.key === entry.groupKey)?.node.children ?? [] : nodes
+  const filtered = React.useMemo(() => filterServiceLayers(options, query), [options, query])
   const selected = options.find((option) => option.id === entry.layerId)
   const update = (patch: Partial<IExternalLayer>): void => onChange({ ...entry, ...patch })
   return (
     <div className="external-fields">
       <CalciteLabel>{translate('serviceType')}<CalciteSelect label={translate('serviceType')} value={entry.type}
-        onCalciteSelectChange={(event) => update({ type: event.target.value === 'WMTS' ? 'WMTS' : 'WMS', layerId: '', tileMatrixSetId: undefined })}>
+        onCalciteSelectChange={(event) => onChange(changeServiceType(entry, event.target.value === 'WMTS' ? 'WMTS' : 'WMS'))}>
         <CalciteOption value="WMS">WMS</CalciteOption><CalciteOption value="WMTS">WMTS</CalciteOption>
       </CalciteSelect></CalciteLabel>
       <CalciteLabel>{translate('serviceUrl')}<CalciteInput type="url" value={entry.url}
@@ -59,14 +63,19 @@ function ExternalRow({ entry, nodes, translate, onChange }: IExternalRowProps): 
         {status === 'error' && <p role="alert">{translate('serviceLoadError')}</p>}
         {status === 'empty' && <p role="status">{translate('noServiceLayers')}</p>}
       </div>
+      <CalciteLabel>{translate('filterServiceLayers')}
+        <CalciteInput type="text" value={query} disabled={options.length === 0}
+          onCalciteInputInput={(event) => setQuery(event.target.value)} />
+      </CalciteLabel>
+      {query.trim() && options.length > 0 && filtered.length === 0 && <p role="status">{translate('noLayerMatches')}</p>}
       <CalciteLabel>{translate('serviceLayer')}<CalciteSelect label={translate('serviceLayer')} value={entry.layerId}
         onCalciteSelectChange={(event) => {
           const option = options.find((item) => item.id === event.target.value)
           if (option) update({ layerId: option.id, title: option.title, tileMatrixSetId: option.matrices[0]?.id })
         }}>
         <CalciteOption value="">{translate('chooseLayer')}</CalciteOption>
-        {entry.layerId && !selected && <CalciteOption value={entry.layerId}>{entry.layerId}</CalciteOption>}
-        {options.map((option) => <CalciteOption key={option.id} value={option.id}>{option.title} ({option.id})</CalciteOption>)}
+        {entry.layerId && !filtered.some((option) => option.id === entry.layerId) && <CalciteOption value={entry.layerId}>{selected?.title ?? entry.layerId} — {translate('currentServiceLayer')}</CalciteOption>}
+        {filtered.map((option) => <CalciteOption key={option.id} value={option.id}>{option.title} ({option.id})</CalciteOption>)}
       </CalciteSelect></CalciteLabel>
       {entry.type === 'WMTS' && <CalciteLabel>{translate('tileMatrix')}<CalciteSelect label={translate('tileMatrix')} value={entry.tileMatrixSetId ?? ''}
         onCalciteSelectChange={(event) => update({ tileMatrixSetId: event.target.value })}>
@@ -108,7 +117,7 @@ export function ExternalEditor({ entries, nodes, translate, onChange }: IExterna
       </div>
     </div>)}
     <CalciteButton appearance="outline" kind="neutral" onClick={() => onChange([...entries, {
-      id: crypto.randomUUID(), type: 'WMS', url: '', title: '', layerId: '', serviceMode: 'KVP', visible: true
+      id: crypto.randomUUID(), type: 'WMS', ...SERVICE_DEFAULTS.WMS, title: '', layerId: '', visible: true
     }])}>{translate('addService')}</CalciteButton>
   </section>
 }

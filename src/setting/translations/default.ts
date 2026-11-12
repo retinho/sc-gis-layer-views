@@ -71,5 +71,8 @@ export default {
   "moveToRootBottom": "Place service at root bottom",
   "moveToBottom": "Place service at group bottom",
   "partialTree": "Some layers could not be loaded. Reconciliation and Apply are blocked to avoid treating unavailable layers as deleted. Restore access and reload the layer structure.",
-  "resolveBeforeApply": "Resolve or remove all missing layer references before applying."
+  "resolveBeforeApply": "Resolve or remove all missing layer references before applying.",
+  "filterServiceLayers": "Filter service layers by name or ID",
+  "noLayerMatches": "No matching layers. The current selection is retained.",
+  "currentServiceLayer": "current selection"
 }

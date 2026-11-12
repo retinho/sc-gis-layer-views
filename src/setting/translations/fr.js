@@ -71,5 +71,8 @@ System.register([], function (_export) { return { execute: function () { _export
   "moveToRootBottom": "Placer le service en bas de la racine",
   "moveToBottom": "Placer le service en bas du niveau",
   "partialTree": "Certaines couches n’ont pas été chargées. Rapprochement et Appliquer sont bloqués pour ne pas traiter ces couches comme supprimées. Rétablissez l’accès et rechargez la structure.",
-  "resolveBeforeApply": "Affectez ou retirez toutes les références manquantes avant d’appliquer."
+  "resolveBeforeApply": "Affectez ou retirez toutes les références manquantes avant d’appliquer.",
+  "filterServiceLayers": "Filtrer les couches par nom ou identifiant",
+  "noLayerMatches": "Aucune couche correspondante. La sélection actuelle est conservée.",
+  "currentServiceLayer": "sélection actuelle"
 }); } }; });

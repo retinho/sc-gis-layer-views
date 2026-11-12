@@ -71,5 +71,8 @@ System.register([], function (_export) { return { execute: function () { _export
   "moveToRootBottom": "Dienst auf Hauptebene ganz unten platzieren",
   "moveToBottom": "Dienst innerhalb der Ebene ganz unten platzieren",
   "partialTree": "Einige Layer konnten nicht geladen werden. Abgleich und Übernehmen sind gesperrt, damit nicht verfügbare Layer nicht als gelöscht behandelt werden. Zugriff wiederherstellen und Layerstruktur neu laden.",
-  "resolveBeforeApply": "Vor dem Übernehmen alle fehlenden Layerreferenzen zuordnen oder entfernen."
+  "resolveBeforeApply": "Vor dem Übernehmen alle fehlenden Layerreferenzen zuordnen oder entfernen.",
+  "filterServiceLayers": "Dienst-Layer nach Name oder ID filtern",
+  "noLayerMatches": "Keine passenden Layer. Die bisherige Auswahl bleibt erhalten.",
+  "currentServiceLayer": "aktuelle Auswahl"
 }); } }; });

@@ -337,6 +337,21 @@ assert.doesNotThrow(() => assertThemeAvailable([], failures))
 assert.doesNotThrow(() => assertThemeAvailable([pathKey('layer:container', 'layer:downstream')], failures))
 const failedChildren = { id: 'subfailure', type: 'map-image', load: async () => {}, loadAll: async () => { throw new Error('children unavailable') } }
 assert.deepEqual(await loadOperationalLayers([failedChildren]), [pathKey('layer:subfailure')])
+// Defaults follow service type; manually entered endpoints survive type changes.
+const { SERVICE_DEFAULTS, changeServiceType, filterServiceLayers } = await load('../src/setting/service-options.ts')
+const defaultWms = { ...external, ...SERVICE_DEFAULTS.WMS }
+const defaultWmts = changeServiceType(defaultWms, 'WMTS')
+assert.equal(defaultWmts.url, SERVICE_DEFAULTS.WMTS.url)
+assert.equal(defaultWmts.serviceMode, 'RESTful')
+assert.equal(defaultWmts.layerId, '')
+assert.equal(changeServiceType(defaultWmts, 'WMS').url, SERVICE_DEFAULTS.WMS.url)
+assert.equal(changeServiceType({ ...external, url: 'https://custom.example.org/service' }, 'WMTS').url, 'https://custom.example.org/service')
+const searchable = [{ id: 'ch.example.eaux', title: 'Gewässer Zürich' }, { id: 'ch.example.forest', title: 'Forêt' }]
+assert.deepEqual(filterServiceLayers(searchable, '  ZURICH gewasser '), [searchable[0]])
+assert.deepEqual(filterServiceLayers(searchable, 'foret'), [searchable[1]])
+assert.deepEqual(filterServiceLayers(searchable, 'example.eaux'), [searchable[0]])
+assert.deepEqual(filterServiceLayers(searchable, 'missing'), [])
+assert.deepEqual(filterServiceLayers(searchable, ''), searchable)
 console.log('Layer selection, visibility, dialog drafts and external-service lifecycle assertions passed.')
 
 await rm(temporaryDirectory, { recursive: true, force: true })

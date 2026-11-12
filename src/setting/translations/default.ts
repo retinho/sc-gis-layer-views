@@ -7,5 +7,14 @@ export default {
   "noMap": "Please select a map in the widget settings.",
   "waitingMap": "Waiting for the connected map.",
   "empty": "No themes configured yet.",
-  "foundation": "Initial framework: theme management and layer switching will follow in the next steps."
+  "foundation": "Layer selection, activation and reset will follow in the next steps.",
+  "managementHelp": "Create themes and arrange the theme cards. Layer selection follows in the next step.",
+  "newTheme": "New theme",
+  "addTheme": "Add theme",
+  "themeName": "Theme name",
+  "copy": "Copy",
+  "duplicate": "Duplicate",
+  "moveUp": "Move up",
+  "moveDown": "Move down",
+  "deleteTheme": "Delete"
 }

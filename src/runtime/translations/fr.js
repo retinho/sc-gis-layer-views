@@ -7,5 +7,5 @@ System.register([], function (_export) { return { execute: function () { _export
   "noMap": "Veuillez choisir une carte dans les paramètres du widget.",
   "waitingMap": "En attente de la carte associée.",
   "empty": "Aucun thème configuré.",
-  "foundation": "Structure initiale : la gestion des thèmes et des couches sera ajoutée aux prochaines étapes."
+  "foundation": "La sélection des couches, l’activation et la réinitialisation suivront."
 }); } }; });

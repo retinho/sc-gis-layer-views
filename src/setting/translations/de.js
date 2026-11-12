@@ -7,5 +7,14 @@ System.register([], function (_export) { return { execute: function () { _export
   "noMap": "Bitte Karte in den Widget-Einstellungen wählen.",
   "waitingMap": "Warten auf die verknüpfte Karte.",
   "empty": "Noch keine Themen konfiguriert.",
-  "foundation": "Grundgerüst: Themenverwaltung und Layer-Schaltung folgen in den nächsten Schritten."
+  "foundation": "Layerauswahl, Aktivierung und Reset folgen in den nächsten Schritten.",
+  "managementHelp": "Themen erstellen und die Reihenfolge festlegen. Die Layerauswahl folgt im nächsten Schritt.",
+  "newTheme": "Neues Thema",
+  "addTheme": "Thema hinzufügen",
+  "themeName": "Themenname",
+  "copy": "Kopie",
+  "duplicate": "Duplizieren",
+  "moveUp": "Nach oben",
+  "moveDown": "Nach unten",
+  "deleteTheme": "Löschen"
 }); } }; });

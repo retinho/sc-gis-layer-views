@@ -1,6 +1,6 @@
 import type { extensionSpec, AppConfig } from 'jimu-core'
 import type { IConfig } from '../config'
-import { readThemeRequest } from '../shared/theme-link'
+import { readThemeRequest, findThemeOwners } from '../shared/theme-link'
 
 export default class ThemeStartup implements extensionSpec.AppConfigProcessorExtension {
   id = 'sc-layer-theme-startup'
@@ -9,7 +9,9 @@ export default class ThemeStartup implements extensionSpec.AppConfigProcessorExt
     if (window.jimuConfig.isInBuilder) return appConfig
     let request: ReturnType<typeof readThemeRequest>
     try { request = readThemeRequest(window.location.href) } catch { return appConfig }
-    if (!request || request.widgetId !== this.widgetId) return appConfig
+    if (!request) return appConfig
+    const owners = findThemeOwners(request, appConfig.widgets)
+    if (owners.length !== 1 || owners[0] !== this.widgetId) return appConfig
     const widget = appConfig.widgets[this.widgetId]
     const mapWidgetId = widget?.useMapWidgetIds?.[0]
     if (!mapWidgetId) return appConfig

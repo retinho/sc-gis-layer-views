@@ -76,13 +76,9 @@ System.register([], function (_export) { return { execute: function () { _export
   "noLayerMatches": "Aucune couche correspondante. La sélection actuelle est conservée.",
   "currentServiceLayer": "sélection actuelle",
   "widgetVersion": "Version du widget",
-  "themeLinks": "Liens des thèmes",
-  "experienceUrl": "URL de l’expérience publiée",
-  "experienceUrlHelp": "Vérifiez l’adresse proposée. Pour une application hébergée séparément, indiquez son URL publique.",
-  "themeLink": "Lien du thème",
-  "copyThemeLink": "Copier le lien du thème",
-  "themeLinkHelp": "Le lien utilise l’identifiant permanent du thème. Appliquez, enregistrez et publiez l’expérience avant de partager le lien.",
-  "invalidExperienceUrl": "Indiquez une URL d’expérience valide dans les paramètres (pas une adresse Builder).",
-  "linkCopied": "Lien du thème copié.",
-  "linkCopyFailed": "Copie impossible. Copiez le lien manuellement depuis le champ."
+  "linkCopied": "Paramètre URL copié.",
+  "linkCopyFailed": "Copie impossible. Copiez manuellement le paramètre affiché ci-dessus.",
+  "themeId": "Identifiant du thème (automatique)",
+  "copyThemeParameter": "Copier le paramètre URL",
+  "themeParameterHelp": "Ajouter à l’URL de l’expérience avec ?, ou avec & si elle contient déjà des paramètres :"
 }); } }; });

@@ -76,13 +76,9 @@ export default {
   "noLayerMatches": "No matching layers. The current selection is retained.",
   "currentServiceLayer": "current selection",
   "widgetVersion": "Widget version",
-  "themeLinks": "Theme links",
-  "experienceUrl": "Published Experience URL",
-  "experienceUrlHelp": "Check the suggested address. For a separately hosted app, enter its public URL.",
-  "themeLink": "Theme link",
-  "copyThemeLink": "Copy theme link",
-  "themeLinkHelp": "The link uses this theme’s permanent ID. Apply changes, save and publish the Experience before sharing.",
-  "invalidExperienceUrl": "Enter a valid Experience URL in the widget settings (not a Builder URL).",
-  "linkCopied": "Theme link copied.",
-  "linkCopyFailed": "Copying failed. Copy the link from the field manually."
+  "linkCopied": "URL parameter copied.",
+  "linkCopyFailed": "Copying failed. Copy the parameter shown above manually.",
+  "themeId": "Theme ID (automatic)",
+  "copyThemeParameter": "Copy URL parameter",
+  "themeParameterHelp": "Append with ? to the Experience URL, or with & if it already has parameters:"
 }

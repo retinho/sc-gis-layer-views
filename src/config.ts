@@ -23,7 +23,6 @@ export interface ILayerTheme {
 }
 
 export interface IConfig {
-  publicExperienceUrl?: string
   themes: ILayerTheme[]
 }
 

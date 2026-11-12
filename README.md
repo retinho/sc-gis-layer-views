@@ -2,7 +2,7 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.8.0 — Externe WMS-/WMTS-Dienste pro Thema
+## Stand 0.8.1 — Externe WMS-/WMTS-Dienste pro Thema
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
 „Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Zusätzliche WMS-/WMTS-Layer werden pro Thema konfiguriert, beim Anzeigen eingefügt und bei Themenwechsel oder Reset vollständig entfernt.
@@ -21,7 +21,7 @@ Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus e
 
 Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.8.0 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
+Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.8.1 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
 
 ## Branches
 
@@ -181,24 +181,23 @@ Nach „Dienst laden“ filtert das neue Textfeld die Layerauswahl nach Name und
 
 Der Einstellungsbereich zeigt oberhalb der Kartenauswahl die Widget-Version. Der Wert stammt aus `props.manifest.version` des von ExB geladenen Widget-Manifests. Es wird keine separate Versionsnummer in der Experience-Konfiguration gespeichert.
 
-## Themenstart per URL (0.8.0)
+## Themenstart per URL (0.8.1)
 
-Das Widget unterstützt den eigenen Query-Parameter `sc-layer-theme=<Widget-ID>:<Themen-ID>`, beispielsweise:
+Jedes Thema erhält automatisch eine feste ID. Bestehende IDs bleiben erhalten, neue Themen und Duplikate erhalten eine UUID. Umbenennen verändert die ID nicht.
+
+Im Themendialog stehen nur noch die nicht editierbare „Themen-ID“ und „URL-Zusatz kopieren“. Die Kopierfunktion kopiert `thema=<ID>`. Diesen Zusatz an die normale Experience-URL hängen:
 
 ```text
-https://portal.example.org/portal/apps/experiencebuilder/experience/?id=APP_ID&sc-layer-theme=widget_12:theme-abc123
+https://example.org/meine-experience/?thema=theme-123
+https://portal.example.org/portal/apps/experiencebuilder/experience/?id=APP_ID&thema=theme-123
 ```
 
-Im Einstellungsbereich unter „Themenlinks“ die URL der veröffentlichten Experience prüfen. Für Portal-Builder-Adressen und die übliche Developer-Edition-Adresse wird eine Laufzeitadresse vorgeschlagen. Bei eigener Hosting-Adresse diese einmal eintragen; ein automatisches Erkennen des späteren IIS-Zielpfads ist nicht möglich. Im Themendialog zeigt „Themenlink“ den vollständigen Link; „Themenlink kopieren“ kopiert ihn. Bei gesperrter Zwischenablage kann das Feld manuell kopiert werden. Änderungen zuerst übernehmen, Experience speichern und veröffentlichen. Links zu noch nicht veröffentlichten Themen funktionieren in der veröffentlichten App noch nicht.
+Ohne vorhandene Query-Parameter mit `?` beginnen, sonst mit `&` ergänzen. Der Parameter gehört vor ein eventuell vorhandenes `#`-Fragment. Eine Experience-Adresse oder Widget-ID muss im Widget nicht konfiguriert werden. Die Themen-ID wird in der gespeicherten App-Konfiguration gesucht. Bei mehrdeutigen IDs wird nichts automatisch aktiviert. Ein Hinweis erscheint beim Öffnen des Themenwidgets. Bereits geteilte Links aus 0.8.0 werden weiterhin gelesen; das alte Format wird nicht mehr in der Oberfläche angeboten.
 
-Die IDs bleiben beim Umbenennen erhalten; Duplizieren erzeugt eine eigene Themen-ID. Löschen und neu Anlegen erzeugt einen neuen Link. Vorhandene App-ID, Sprache und weitere Parameter einer explizit eingetragenen Zieladresse bleiben erhalten. In automatisch vorgeschlagenen Adressen werden Builder- und Authentifizierungsparameter nicht übernommen.
+Die Experience vor dem Teilen speichern und veröffentlichen. Links zu noch nicht veröffentlichten Themen funktionieren in der veröffentlichten App noch nicht. Löschen und Neuanlegen erzeugt eine neue ID.
 
-Eine `APP_CONFIG_PROCESSOR_EXTENSION` startet die Logik unabhängig davon, ob das Themenpanel geöffnet wurde. Die standardmässig geöffnete Layer-Liste bleibt geöffnet. Sobald die aktive Ansicht des verknüpften Kartenwidgets bereit ist, wird das verlinkte Thema einmalig angewendet – einschliesslich externer Dienste, ohne Kameraänderung. Die Karte muss auf der aufgerufenen Seite tatsächlich geladen werden. Bei mehreren WebMaps muss die aktive Karte zum Thema passen; der Link schaltet nicht selbst auf eine andere WebMap um.
+Der Hintergrundstart wartet auf die aktive verknüpfte Karte, ohne das Themenpanel zu öffnen. Die standardmässig geöffnete Layer-Liste bleibt geöffnet. Ohne Parameter erfolgt keine automatische Aktivierung. Die URL wird einmal pro Seitenaufruf ausgewertet; Reset oder spätere manuelle Auswahl führen nicht zu erneuter Aktivierung. Ein vollständiges Neuladen startet erneut mit dem URL-Thema.
 
-Ohne Parameter erfolgt keine automatische Aktivierung. Ein unbekanntes Thema oder eine falsche Karte führt zu einem Hinweis im Themenwidget und keiner Sichtbarkeitsänderung. Ein nicht geladenes Themenpanel zeigt diesen Hinweis erst beim Öffnen. Builder-Bearbeitung wird vom automatischen Start ausgenommen. Nach zwei Minuten endet die Hintergrundbeobachtung; Öffnen des Themenwidgets erlaubt den Start nach späterer Kartenbereitschaft. Ladefehler werden wie bei „Anzeigen“ behandelt; ein fehlgeschlagener Aktivierungsversuch wird nicht endlos wiederholt.
+Die Karte muss auf der aufgerufenen Seite geladen werden und zum Thema passen. Nach zwei Minuten endet die Hintergrundbeobachtung; Öffnen des Themenwidgets ermöglicht den Start nach späterer Kartenbereitschaft. Builder-Bearbeitung bleibt vom automatischen Start ausgenommen. Hinweise zu unbekannten/ungültigen Themen erscheinen im Themenwidget, sobald es geöffnet wird.
 
-Ein späteres Öffnen des Panels, Reset oder ein manueller Themenwechsel aktiviert den Link nicht erneut. Die URL bleibt erhalten: Ein vollständiges Neuladen der Experience startet erneut mit dem verlinkten Thema. Die gemeinsame Laufzeitverwaltung bindet ihre Bereinigung an die Kartenansicht; das Schliessen eines Panels entfernt keine Dienste. Änderungen des URL-Parameters innerhalb derselben geladenen Seite lösen bewusst keinen weiteren Start aus.
-
-Abnahme: veröffentlichte Experience über kopierten Link öffnen, während standardmässig die Layer-Liste aktiv ist. Theme-Layer und externe Dienste müssen ohne Öffnen des Themenpanels erscheinen. Danach Themenpanel öffnen, Reset ausführen und manuell wechseln; keine erneute URL-Aktivierung. Ohne Parameter unveränderten Start prüfen. Zusätzlich unbekannte Themen-ID, verzögerte Karte, umbenanntes Thema, Zugriff als normaler Benutzer und selbst gehostete Zieladresse prüfen.
-
-Lokale Regressionen umfassen Linkerzeugung, Portal-/Developer-Adressen, ungültige und doppelte Parameter, verspätete Kartenbereitschaft, Hintergrundstart ohne Panel, einmalige Ausführung, Reset/manuelle Auswahl, Beobachterbereinigung und verworfene Kartenladevorgänge. Vollständiger ExB-Build, Portal-Extension-Laden und Browser-Zwischenablage müssen auf dem Zielsystem geprüft werden.
+Abnahme: Thema speichern/veröffentlichen, URL-Zusatz kopieren und an die Experience-Adresse hängen. Bei standardmässig aktiver Layer-Liste muss das Thema starten, ohne das Themenpanel zu öffnen. Danach Reset und manuelle Auswahl prüfen. Ohne Parameter muss die WebMap unverändert starten.

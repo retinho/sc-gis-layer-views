@@ -76,13 +76,9 @@ System.register([], function (_export) { return { execute: function () { _export
   "noLayerMatches": "Keine passenden Layer. Die bisherige Auswahl bleibt erhalten.",
   "currentServiceLayer": "aktuelle Auswahl",
   "widgetVersion": "Widget-Version",
-  "themeLinks": "Themenlinks",
-  "experienceUrl": "URL der veröffentlichten Experience",
-  "experienceUrlHelp": "Vorgeschlagene Adresse prüfen. Bei einer separat gehosteten App deren öffentliche URL eintragen.",
-  "themeLink": "Themenlink",
-  "copyThemeLink": "Themenlink kopieren",
-  "themeLinkHelp": "Der Link verwendet die feste ID dieses Themas. Änderungen übernehmen, Experience speichern und veröffentlichen, bevor der Link geteilt wird.",
-  "invalidExperienceUrl": "In den Widget-Einstellungen eine gültige Experience-URL eintragen (keine Builder-Adresse).",
-  "linkCopied": "Themenlink kopiert.",
-  "linkCopyFailed": "Kopieren nicht möglich. Den Link aus dem Feld manuell kopieren."
+  "linkCopied": "URL-Zusatz kopiert.",
+  "linkCopyFailed": "Kopieren nicht möglich. Den oben angezeigten URL-Zusatz manuell kopieren.",
+  "themeId": "Themen-ID (automatisch)",
+  "copyThemeParameter": "URL-Zusatz kopieren",
+  "themeParameterHelp": "Mit ? an die Experience-URL anhängen; bei vorhandenen Parametern mit &:"
 }); } }; });

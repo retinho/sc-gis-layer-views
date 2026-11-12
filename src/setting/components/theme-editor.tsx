@@ -12,13 +12,11 @@ import { getLeafKeys } from '../layer-selection'
 import { ExternalEditor } from './external-editor'
 import { isValidExternalLayer } from '../../shared/external-config'
 import type { ILayerNode } from '../layer-selection'
-import { createThemeLink } from '../../shared/theme-link'
+import { themeParameter } from '../../shared/theme-link'
 import { WebMapReconcile } from './webmap-reconcile'
 import { LayerTree } from './layer-tree'
 
 interface IThemeEditorProps {
-  widgetId: string
-  experienceUrl: string
   theme: ILayerTheme
   sources: readonly IConfiguredWebMap[]
   translate: (key: keyof typeof messages) => string
@@ -26,12 +24,11 @@ interface IThemeEditorProps {
   onCancel: () => void
 }
 
-export function ThemeEditor({ theme, widgetId, experienceUrl, sources, translate, onApply, onCancel }: IThemeEditorProps): React.ReactElement {
+export function ThemeEditor({ theme, sources, translate, onApply, onCancel }: IThemeEditorProps): React.ReactElement {
   const [copyStatus, setCopyStatus] = React.useState<'linkCopied' | 'linkCopyFailed' | null>(null)
-  let themeLink = ''
-  try { themeLink = createThemeLink(experienceUrl, widgetId, theme.id) } catch { /* Invalid base URL is shown below. */ }
+  const urlParameter = themeParameter(theme.id)
   const copyLink = async (): Promise<void> => {
-    try { await navigator.clipboard.writeText(themeLink); setCopyStatus('linkCopied') }
+    try { await navigator.clipboard.writeText(urlParameter); setCopyStatus('linkCopied') }
     catch { setCopyStatus('linkCopyFailed') }
   }
   const [draft, setDraft] = React.useState<ILayerTheme>(() => createThemeDraft(theme))
@@ -82,10 +79,9 @@ export function ThemeEditor({ theme, widgetId, experienceUrl, sources, translate
             <CalciteInput type="text" value={draft.requester ?? ''}
               onCalciteInputInput={(event) => { const requester = event.target.value; setDraft((current) => ({ ...current, requester })) }} />
           </CalciteLabel>
-          <CalciteLabel>{translate('themeLink')}<CalciteInput value={themeLink} readOnly /></CalciteLabel>
-          <CalciteButton appearance="outline" kind="neutral" disabled={!themeLink} onClick={() => { void copyLink() }}>{translate('copyThemeLink')}</CalciteButton>
-          <p>{translate('themeLinkHelp')}</p>
-          {!themeLink && <p role="alert">{translate('invalidExperienceUrl')}</p>}
+          <CalciteLabel>{translate('themeId')}<CalciteInput value={theme.id} readOnly /></CalciteLabel>
+          <CalciteButton appearance="outline" kind="neutral" onClick={() => { void copyLink() }}>{translate('copyThemeParameter')}</CalciteButton>
+          <p>{translate('themeParameterHelp')} <code>{urlParameter}</code></p>
           {copyStatus && <p role="status">{translate(copyStatus)}</p>}
           {sources.length > 1 && <CalciteLabel>
             {translate('webMapSource')}

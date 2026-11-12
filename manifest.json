@@ -2,7 +2,7 @@
   "name": "sc-gis-layer-views",
   "label": "Layer-Themen",
   "type": "widget",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "exbVersion": "1.17.0",
   "author": "SC-GIS",
   "description": "Vordefinierte Layer-Themen für eine verknüpfte WebMap.",

@@ -21,13 +21,7 @@ export function useThemeManagement(props: AllWidgetSettingProps<IMConfig>): IThe
     props.onSettingChange({ id: props.id, config: config.set('themes', next) })
   }
   const newId = (): string => {
-    const base = `theme-${Date.now().toString(36)}`
-    let candidate = base
-    let index = 1
-    while (themes.some((theme) => theme.id === candidate)) {
-      candidate = `${base}-${index++}`
-    }
-    return candidate
+    return `theme-${crypto.randomUUID()}`
   }
   return {
     themes,

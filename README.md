@@ -2,15 +2,15 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Stand 0.8.4 — Externe WMS-/WMTS-Dienste pro Thema
+## Version 1.0.0 — für den produktiven Einsatz freigegeben
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
 „Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Zusätzliche WMS-/WMTS-Layer werden pro Thema konfiguriert, beim Anzeigen eingefügt und bei Themenwechsel oder Reset vollständig entfernt.
 
 ## Herunterladen und installieren
 
-1. Auf GitHub den Branch `development` wählen und über **Code → Download ZIP** herunterladen.
-2. ZIP entpacken; den Ordner `sc-gis-layer-views-development` in `sc-gis-layer-views` umbenennen.
+1. Auf GitHub den Branch `production` wählen und über **Code → Download ZIP** herunterladen.
+2. ZIP entpacken; den Ordner `sc-gis-layer-views-production` in `sc-gis-layer-views` umbenennen.
 3. Diesen Ordner unter `client/your-extensions/widgets/sc-gis-layer-views/` der bestehenden ExB-1.17-Installation ablegen. `manifest.json` muss direkt darin liegen, ohne zusätzliche Ordnerebene.
 4. Die Developer Edition nach deren Installationsanleitung starten/neustarten. Das Widget „Layer-Themen“ hinzufügen und in seinen Einstellungen ein vorhandenes Karten-Widget auswählen.
 5. Themen in den Widget-Einstellungen erstellen. Über „Thema konfigurieren“ den grossen Dialog öffnen, Namen bearbeiten und Layer auswählen. Gruppen mit dem Pfeil öffnen; die Gruppen-Checkbox wählt alle Kinder aus. „Übernehmen“ übernimmt den Entwurf, „Abbrechen“ verwirft ihn. Themen lassen sich im Settingspanel weiterhin duplizieren, sortieren und entfernen. Die Experience anschliessend speichern.
@@ -19,14 +19,14 @@ Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer 
 
 Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus einem separaten npm-Projekt in diesem Widget. Im Verzeichnis `client` der installierten Developer Edition `npm run build:prod` ausführen. Den erzeugten Widget-Ordner unter `client/dist-prod/widgets/` anhand seines Namens lokalisieren und vollständig auf den IIS-Webserver kopieren. Nicht den TypeScript-Quellordner als fertiges Widget veröffentlichen.
 
-Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
+Der freigegebene Quellstand liegt auf `production` und ist mit `v1.0.0` gekennzeichnet. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. **0.8.4 ist zur Abnahme auf development bereit.** Lokal ist kein vollständiges ExB-SDK installiert; Build und Dienst-Darstellung dieser Erweiterung sind noch auf der Zielinstallation zu prüfen.
+Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. Der Betreiber hat den Portal-Test von 0.8.4 einschliesslich URL-Start bei geschlossenem Themenwidget erfolgreich bestätigt und am 12. November 2026 die Produktionsfreigabe erteilt. **1.0.0 enthält dieselbe Laufzeitlogik; geändert wurden nur Versionsnummer und Dokumentation.** Lokal ist kein vollständiges ExB-SDK installiert. Den Quellstand 1.0.0 auf dem ExB-Server kompilieren und den vollständigen Build auf dem Widget-Webserver bereitstellen.
 
 ## Branches
 
 - `development`: laufende Entwicklung und Download für die Abnahme.
-- `production`: nur freigegebene Stände; derzeit leer.
+- `production`: freigegebener Stand 1.0.0 (Tag `v1.0.0`).
 - `main`: ursprünglicher leerer Ausgangsstand.
 
 Fachliche Festlegungen: [Bauplan](docs/BAUPLAN.md).
@@ -36,6 +36,8 @@ Technische Referenzen: [Kartenbindung](https://developers.arcgis.com/experience-
 ## Prüfung gegen Esri 1.17
 
 Quellenvergleich und Korrekturen sind im [Prüfbericht](docs/EXB-1.17-PRUEFUNG.md) dokumentiert. Als feste Referenz dienen die offiziellen Esri-Beispiele im Branch `1.17`, Commit `16ccec0c21cfff1cb66e283eacaafc326ed6b95c`. Die mit ExB gelieferten Bibliotheken unverändert verwenden; keine aktuelle Calcite-/React-Version separat installieren.
+
+Die folgenden Abschnitte dokumentieren die Entwicklungshistorie. Frühere Hinweise auf ausstehende Freigaben beziehen sich auf den jeweiligen damaligen Stand; massgeblich ist die Freigabe 1.0.0 oben.
 
 ## Themenverwaltung 0.2.0
 

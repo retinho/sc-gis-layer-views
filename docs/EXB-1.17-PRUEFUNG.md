@@ -1,5 +1,10 @@
 # Prüfung des Grundgerüsts gegen ExB 1.17
 
+## Freigabestand 1.0.0 — 12. November 2026
+
+Der Betreiber bestätigte den erfolgreichen Portal-Test von 0.8.4 und erteilte ausdrücklich die Produktionsfreigabe. Die Laufzeitquellen von 1.0.0 entsprechen unverändert dem getesteten Commit `4dcac94`. Nur Manifest-Version und Dokumentation wurden geändert. Freigabestand: Branch production, Tag v1.0.0; development erhält denselben Stand. Frühere Aussagen zu ausstehenden Tests/Freigaben unten sind historische Prüfstände. Kein vollständiges ExB-SDK lokal; Build und Webserverbereitstellung von 1.0.0 erfolgen beim Betreiber.
+
+
 Prüfdatum: 12. November 2026. Widget-Version: 0.1.1.
 
 ## Referenz und Grenzen

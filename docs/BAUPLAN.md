@@ -1,6 +1,10 @@
 # Vereinbarter Bauplan und Abnahmestand
 
-Stand: 0.8.4 auf development, 12. November 2026. Ziel: Experience Builder Developer Edition 1.17, ArcGIS Enterprise 11.5. Keine Produktionsfreigabe erteilt.
+Stand: 1.0.0, 12. November 2026. Ziel: Experience Builder Developer Edition 1.17, ArcGIS Enterprise 11.5. Vom Betreiber ausdrücklich für den produktiven Einsatz freigegeben. Quellstand auf production und development, Release-Tag v1.0.0.
+
+## Produktionsfreigabe 1.0.0
+
+Der Betreiber hat den Portal-Test des Standes 0.8.4 (`4dcac94`) erfolgreich bestätigt, insbesondere den URL-Themenstart ohne Öffnen des Themenwidgets. Anschliessend wurde die Übernahme nach production ausdrücklich beauftragt. 1.0.0 übernimmt diese Laufzeitlogik unverändert; ausschliesslich Manifest-Version und Dokumentation werden aktualisiert. Der neue Quellstand ist für den Build mit ExB 1.17 freigegeben. Kompilierung und Bereitstellung des mit 1.0.0 bezeichneten Builds auf dem Webserver erfolgen durch den Betreiber; ein Git-Push ist kein Server-Deployment.
 
 ## Umgesetzte Funktionen
 
@@ -29,13 +33,13 @@ Bei Teilausfällen zeigt das Frontend einen Hinweis. Reset kann nur die gespeich
 
 ## Bestätigt und noch offen
 
-Der Nutzer hat Kompilierung und die bisherige Bedienung bestätigt, darunter Layerbaum, Gruppenwahl, Dialog, Anzeigen, Reset, WMS, mehrere externe Dienste und Positionierung. Zuletzt wurde der Stand 0.7.0 als funktionierend gemeldet. Daraus folgt keine separate Bestätigung jedes unten aufgeführten Spezialfalls.
+Der Nutzer hat Kompilierung und die bisherige Bedienung bestätigt, darunter Layerbaum, Gruppenwahl, Dialog, Anzeigen, Reset, WMS, mehrere externe Dienste und Positionierung. Zuletzt wurde der Portal-Test von 0.8.4 als erfolgreich bestätigt. Daraus folgt keine separate Bestätigung jedes unten aufgeführten Spezialfalls.
 
 Lokale Regressionen prüfen Sichtbarkeit, Gruppenmodi, Entwürfe, Abgleich, Platzierungen, Themenwechsel, Fehler-Rollback, Besitzbereinigung und Teilausfälle. Isolierte Strict-Typprüfung gegen SDK 4.32 und Syntaxprüfung ergänzen diese Tests. Ein vollständiges ExB-SDK ist lokal nicht installiert.
 
-Vor Freigabe auf dem Zielsystem prüfen:
+Betriebs- und Regressionstestliste für künftige Änderungen (nicht jeder Spezialfall wurde separat vom Betreiber bestätigt):
 
-- 0.8.4 kompilieren; bestehende gespeicherte Experience öffnen, speichern und neu laden.
+- Freigegebenen Stand kompilieren; bestehende gespeicherte Experience öffnen, speichern und neu laden.
 - Eigenen Dienst in eine andere Gruppe/Hauptebene verschieben; Reset und Themenwechsel ohne zurückbleibende Einträge.
 - Nicht benötigten WebMap-Dienst ausfallen lassen: anderes Thema und Reset bleiben nutzbar, Hinweis erscheint. Betroffenes Thema wird ohne Kartenänderung abgewiesen. Nach Wiederherstellung neu laden.
 - Fehlende Referenz im Dialog: Übernehmen gesperrt; Zuordnen/Entfernen löst die Sperre. Bei Ladefehlern keine Bereinigung, erst Struktur erneut laden.
@@ -45,7 +49,7 @@ Vor Freigabe auf dem Zielsystem prüfen:
 
 ## Freigabeablauf
 
-Development enthält die Entwicklungsdateien für den Build auf dem ExB-Server. Erst nach ausdrücklicher Abnahme Version 1.0.0 festlegen, geprüften Commit nach production übernehmen und als Release kennzeichnen. Bestehenden Build und Experience-Konfiguration für Rückfall sichern. Git-Push, Serverbereitstellung und Portal-Abnahme sind getrennte Schritte.
+Die ausdrückliche Abnahme und Produktionsfreigabe für 1.0.0 liegen vor. Production enthält die freigegebenen Entwicklungsdateien für den Build auf dem ExB-Server; development wird auf demselben Freigabestand gehalten. Tag v1.0.0 kennzeichnet diesen Stand. Bestehenden Build und Experience-Konfiguration für Rückfall sichern. Git-Push, Serverbereitstellung und Portal-Abnahme sind getrennte Schritte.
 
 Zusätzliche Abnahme 0.7.2: neuen Dienst hinzufügen, WMS-/WMTS-Vorgaben prüfen, eigene URL überschreiben, Dienst laden und nach Namen/ID filtern. Bestehende Auswahl muss beim Filtern erhalten bleiben.
 
@@ -60,7 +64,9 @@ Versionsanzeige 0.7.3: Der Admin-Einstellungsbereich zeigt die Version des gelad
 - Vereinfachung 0.8.1: Nur automatische Themen-ID und „URL-Zusatz kopieren“ im Dialog. Keine Zieladresse oder Widget-ID konfigurieren. Die ID referenziert die gespeicherte/veröffentlichte Konfiguration.
 - Ungültige oder nicht passende Themen verändern die Karte nicht. Hinweise werden im Themenwidget angezeigt. Hintergrund wartet höchstens zwei Minuten auf die Karte; bei späterem Laden kann das Themenwidget geöffnet werden.
 
-Die in der README beschriebene Abnahme mit geschlossenem Themenpanel, Portal-Anmeldung und veröffentlichtem Link ist vor Produktionsfreigabe zusätzlich erforderlich.
+Der Portal-Test mit geschlossenem Themenpanel wurde für 0.8.4 vom Betreiber als erfolgreich bestätigt.
+
+Die folgenden Korrekturabschnitte sind historische Prüfstände. Frühere offene Freigabehinweise werden durch die Produktionsfreigabe 1.0.0 oben abgelöst.
 
 ## Korrektur Hintergrundstart 0.8.2
 

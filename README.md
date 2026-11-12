@@ -1,0 +1,34 @@
+# sc-gis-layer-views
+
+Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
+
+## Stand 0.1.0 — Grundgerüst
+
+Enthalten: Karten-Widget-Auswahl, Kartenanbindung, lokalisierte Oberfläche, Themenkarten-Komponente und leere Standardkonfiguration.
+Noch nicht enthalten: Admin-Themenverwaltung, Layerbaum, Themenaktivierung, Reset und externe Dienste. Anzeigen und Reset sind deshalb bewusst deaktiviert. Es werden keine Kartendaten oder Sichtbarkeiten verändert.
+
+## Herunterladen und installieren
+
+1. Auf GitHub den Branch `development` wählen und über **Code → Download ZIP** herunterladen.
+2. ZIP entpacken; den Ordner `sc-gis-layer-views-development` in `sc-gis-layer-views` umbenennen.
+3. Diesen Ordner unter `client/your-extensions/widgets/sc-gis-layer-views/` der bestehenden ExB-1.17-Installation ablegen. `manifest.json` muss direkt darin liegen, ohne zusätzliche Ordnerebene.
+4. Die Developer Edition nach deren Installationsanleitung starten/neustarten. Das Widget „Layer-Themen“ hinzufügen und in seinen Einstellungen ein vorhandenes Karten-Widget auswählen.
+5. Die Startkonfiguration enthält keine Beispielthemen. Für eine reine Layout-Vorschau können vor dem Hinzufügen des Widgets in `config.json` Themenobjekte mit `id` und `name` eingetragen werden; dies schaltet noch keine Layer.
+
+## Kompilieren und bereitstellen
+
+Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus einem separaten npm-Projekt in diesem Widget. Im Verzeichnis `client` der installierten Developer Edition `npm run build:prod` ausführen. Den erzeugten Widget-Ordner unter `client/dist-prod/widgets/` anhand seines Namens lokalisieren und vollständig auf den IIS-Webserver kopieren. Nicht den TypeScript-Quellordner als fertiges Widget veröffentlichen.
+
+Nach erfolgreicher Abnahme den freigegebenen Stand nach `production` übernehmen. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
+
+Dieser erste Zwischenstand ist **nicht produktionsreif**. Ein Build und eine visuelle Abnahme in ExB 1.17 stehen aus; lokal ist kein ExB-SDK installiert.
+
+## Branches
+
+- `development`: laufende Entwicklung und Download für die Abnahme.
+- `production`: nur freigegebene Stände; derzeit leer.
+- `main`: ursprünglicher leerer Ausgangsstand.
+
+Fachliche Festlegungen: [Bauplan](docs/BAUPLAN.md).
+
+Technische Referenzen: [Kartenbindung](https://developers.arcgis.com/experience-builder/guide/use-map-widget-in-widget/), [Calcite in ExB](https://www.esri.com/arcgis-blog/products/experience-builder/developers/optimizing-custom-widgets-in-arcgis-experience-builder-with-jimu-ui-calcite-and-map-components).

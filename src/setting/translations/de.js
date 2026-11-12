@@ -1,0 +1,11 @@
+System.register([], function (_export) { return { execute: function () { _export({
+  "_widgetLabel": "Layer-Themen",
+  "themes": "Themen",
+  "reset": "Reset",
+  "show": "Anzeigen",
+  "map": "Karte",
+  "noMap": "Bitte Karte in den Widget-Einstellungen wählen.",
+  "waitingMap": "Warten auf die verknüpfte Karte.",
+  "empty": "Noch keine Themen konfiguriert.",
+  "foundation": "Grundgerüst: Themenverwaltung und Layer-Schaltung folgen in den nächsten Schritten."
+}); } }; });

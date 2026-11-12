@@ -1,0 +1,24 @@
+{
+  "name": "sc-gis-layer-views",
+  "label": "Layer-Themen",
+  "type": "widget",
+  "version": "0.1.0",
+  "exbVersion": "1.17.0",
+  "author": "SC-GIS",
+  "description": "Vordefinierte Layer-Themen f\u00fcr eine verkn\u00fcpfte WebMap.",
+  "dependency": [
+    "jimu-arcgis"
+  ],
+  "translatedLocales": [
+    "en",
+    "de",
+    "fr"
+  ],
+  "defaultSize": {
+    "width": 580,
+    "height": 380
+  },
+  "properties": {
+    "hasConfig": true
+  }
+}

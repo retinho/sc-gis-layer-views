@@ -2,7 +2,7 @@
 
 Custom Widget für Experience Builder Developer Edition **1.17** und ArcGIS Enterprise **11.5**.
 
-## Version 1.0.0 — für den produktiven Einsatz freigegeben
+## Version 1.0.1 — für den produktiven Einsatz freigegeben
 
 Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer Layerbaum pro Thema. Gruppen wählen rekursiv alle enthaltenen Layer; einzelne Layer können abgewählt werden. Teilweise ausgewählte Gruppen werden entsprechend markiert.
 „Anzeigen“ ersetzt jetzt die Sichtbarkeit der operativen Kartenlayer durch die Themenauswahl. Reset stellt die gespeicherte WebMap-Sichtbarkeit wieder her. Zusätzliche WMS-/WMTS-Layer werden pro Thema konfiguriert, beim Anzeigen eingefügt und bei Themenwechsel oder Reset vollständig entfernt.
@@ -19,14 +19,14 @@ Enthalten: Kartenverknüpfung, Themenverwaltung, Themenkarten und aufklappbarer 
 
 Abhängigkeiten kommen aus der vollständigen ExB-1.17-Installation, nicht aus einem separaten npm-Projekt in diesem Widget. Im Verzeichnis `client` der installierten Developer Edition `npm run build:prod` ausführen. Den erzeugten Widget-Ordner unter `client/dist-prod/widgets/` anhand seines Namens lokalisieren und vollständig auf den IIS-Webserver kopieren. Nicht den TypeScript-Quellordner als fertiges Widget veröffentlichen.
 
-Der freigegebene Quellstand liegt auf `production` und ist mit `v1.0.0` gekennzeichnet. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
+Der freigegebene Quellstand liegt auf `production` und ist mit `v1.0.1` gekennzeichnet. Den HTTPS-Link zur gebauten `manifest.json` im ArcGIS Enterprise Portal als Experience-Builder-Widget registrieren. Webserver-CORS, HTTPS und Zugriff müssen zur Portalumgebung passen.
 
-Der Nutzer hat Layerbaum, Anzeigen, Reset und den grossen Konfigurationsdialog in ExB bestätigt. Der Betreiber hat den Portal-Test von 0.8.4 einschliesslich URL-Start bei geschlossenem Themenwidget erfolgreich bestätigt und am 12. November 2026 die Produktionsfreigabe erteilt. **1.0.0 enthält dieselbe Laufzeitlogik; geändert wurden nur Versionsnummer und Dokumentation.** Lokal ist kein vollständiges ExB-SDK installiert. Den Quellstand 1.0.0 auf dem ExB-Server kompilieren und den vollständigen Build auf dem Widget-Webserver bereitstellen.
+Der Betreiber hat die Korrektur des Kaltstarts ohne Browsercache in Version **1.0.1** als funktionierend bestätigt und am 25. November 2026 für den produktiven Einsatz freigegeben. Die Laufzeitlogik entspricht unverändert dem getesteten Entwicklungsstand `5244a46`. Lokal ist kein vollständiges ExB-SDK installiert; die Kompilierung und Webserverbereitstellung erfolgen beim Betreiber.
 
 ## Branches
 
 - `development`: laufende Entwicklung und Download für die Abnahme.
-- `production`: freigegebener Stand 1.0.0 (Tag `v1.0.0`).
+- `production`: freigegebener Stand 1.0.1 (Tag `v1.0.1`).
 - `main`: ursprünglicher leerer Ausgangsstand.
 
 Fachliche Festlegungen: [Bauplan](docs/BAUPLAN.md).
@@ -226,10 +226,12 @@ Der Startimport nutzt jetzt `webpackMode: "eager"`: Laufzeitcode wird im Erweite
 
 Abnahme: vollständig neu bauen und Widget auf dem Webserver ersetzen, Cache umgehen, URL-Thema mit geschlossenem Panel starten. Im Netzwerk darf kein Request für `sc-gis-layer-views_src_runtime_url-startup_ts.js` mehr entstehen. Danach Anzeigen/Reset prüfen. Lokale Regressionen ersetzen keinen vollständigen ExB-Build oder Portal-Test; Produktionsfreigabe steht weiterhin aus.
 
-## Korrektur 1.0.1 — Kaltstart ohne Browsercache (25. November 2026)
+## Freigegebene Korrektur 1.0.1 — Kaltstart ohne Browsercache (25. November 2026)
 
-Development-Teststand; production/v1.0.0 bleibt bis zur erneuten Abnahme unverändert. Der Betreiber meldet einen Ausfall im privaten Browserfenster auch ohne Themenparameter. Konsole: `window.require is not a function`, danach `Register widget extension error. Layer-Themen` und Folgefehler der Datenquellen.
+Am 25. November 2026 vom Betreiber als funktionierend bestätigt und ausdrücklich für production freigegeben (Tag v1.0.1). Der Betreiber meldet einen Ausfall im privaten Browserfenster auch ohne Themenparameter. Konsole: `window.require is not a function`, danach `Register widget extension error. Layer-Themen` und Folgefehler der Datenquellen.
 
 Die eager eingebundene Startlogik enthielt statische SDK-Imports für WebMap, esri/config, WMSLayer und WMTSLayer. SystemJS kann diese externen Abhängigkeiten bereits beim Registrieren des Erweiterungsbundles auflösen, bevor process() und der dortige SDK-Loader laufen. Ein warmer Cache kann die falsche Reihenfolge verdecken. Diese vier Imports sind nun reine Typimporte; tatsächliches Laden erfolgt innerhalb der asynchronen Funktionen über Esris loadArcGISJSAPIModules. Die eager Bündelung bleibt erhalten, um den früheren falschen Portal-Chunkpfad zu vermeiden.
 
 Abnahme: vollständigen 1.0.1-Build auf der Testbereitstellung ersetzen; frische private Sitzungen in Edge und Firefox, jeweils nach Anmeldung ohne und mit Themenparameter; Karte, Standardwidgets, manuelle Themenauswahl und Reset prüfen. Zusätzlich mit dem Konto der Kollegin testen. Die Themen stammen aus der veröffentlichten App-Konfiguration, nicht aus lokalem Browserspeicher. Keine Änderung an Portal-init.js oder Browser-Sicherheitsoptionen erforderlich.
+
+Freigabe 1.0.1: unveränderte Laufzeitquellen des getesteten Commits `5244a46`; für die Freigabe wurden nur Dokumentation und Abnahmestand aktualisiert. Production und development enthalten denselben Freigabestand. Die Rückmeldung bestätigt die Fehlerbehebung insgesamt, nicht separat jeden aufgeführten Testfall.

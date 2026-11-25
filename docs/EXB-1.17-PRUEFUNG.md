@@ -104,3 +104,11 @@ Die Portal-Konsole aus der Abnahme von 0.8.3 belegt: Der Config-Processor läuft
 Der Startimport nutzt jetzt `webpackMode: "eager"`: Laufzeitcode wird im Erweiterungsbundle mitgeliefert und erst nach SDK-Bereitschaft ausgeführt. Für diesen Import gibt es keinen separaten Chunk-Request mehr. Siehe [Webpack import modes](https://webpack.js.org/api/module-methods/#webpackmode). Keine Änderung von Portal-Dateien oder MIME-Konfiguration nötig.
 
 Abnahme: vollständig neu bauen und Widget auf dem Webserver ersetzen, Cache umgehen, URL-Thema mit geschlossenem Panel starten. Im Netzwerk darf kein Request für `sc-gis-layer-views_src_runtime_url-startup_ts.js` mehr entstehen. Danach Anzeigen/Reset prüfen. Lokale Regressionen ersetzen keinen vollständigen ExB-Build oder Portal-Test; Produktionsfreigabe steht weiterhin aus.
+
+## Korrektur 1.0.1 — Kaltstart ohne Browsercache (25. November 2026)
+
+Development-Teststand; production/v1.0.0 bleibt bis zur erneuten Abnahme unverändert. Der Betreiber meldet einen Ausfall im privaten Browserfenster auch ohne Themenparameter. Konsole: `window.require is not a function`, danach `Register widget extension error. Layer-Themen` und Folgefehler der Datenquellen.
+
+Die eager eingebundene Startlogik enthielt statische SDK-Imports für WebMap, esri/config, WMSLayer und WMTSLayer. SystemJS kann diese externen Abhängigkeiten bereits beim Registrieren des Erweiterungsbundles auflösen, bevor process() und der dortige SDK-Loader laufen. Ein warmer Cache kann die falsche Reihenfolge verdecken. Diese vier Imports sind nun reine Typimporte; tatsächliches Laden erfolgt innerhalb der asynchronen Funktionen über Esris loadArcGISJSAPIModules. Die eager Bündelung bleibt erhalten, um den früheren falschen Portal-Chunkpfad zu vermeiden.
+
+Abnahme: vollständigen 1.0.1-Build auf der Testbereitstellung ersetzen; frische private Sitzungen in Edge und Firefox, jeweils nach Anmeldung ohne und mit Themenparameter; Karte, Standardwidgets, manuelle Themenauswahl und Reset prüfen. Zusätzlich mit dem Konto der Kollegin testen. Die Themen stammen aus der veröffentlichten App-Konfiguration, nicht aus lokalem Browserspeicher. Keine Änderung an Portal-init.js oder Browser-Sicherheitsoptionen erforderlich.

@@ -14,6 +14,20 @@ assert.equal(manifest.properties.notShareDynamicModules, true, 'Hosted widget mu
 assert.deepEqual(manifest.extensions, [{ point: 'APP_CONFIG_PROCESSOR', uri: 'extensions/theme-startup' }])
 await readFile(new URL('../src/' + manifest.extensions[0].uri + '.ts', import.meta.url), 'utf8')
 
+// Registration must work before the AMD SDK loader exists. Eager imports
+// still expose static externals to SystemJS, even before process() is called.
+const checkedStartupModules = new Set()
+async function checkStartupImports(url) {
+  if (checkedStartupModules.has(url.href)) return
+  checkedStartupModules.add(url.href)
+  const emitted = stripTypeScriptTypes(await readFile(url, 'utf8'))
+  assert.doesNotMatch(emitted, /from\s*['"]esri\//, `Early SDK external in ${url.pathname}`)
+  const dependencies = [...emitted.matchAll(/from\s*['"](\.[^'"]+)['"]/g),
+    ...emitted.matchAll(/import\(\s*(?:\/\*[\s\S]*?\*\/\s*)?['"](\.[^'"]+)['"]\s*\)/g)]
+  for (const dependency of dependencies) await checkStartupImports(new URL(dependency[1] + '.ts', url))
+}
+await checkStartupImports(new URL('../src/extensions/theme-startup.ts', import.meta.url))
+
 const temporaryDirectory = await mkdtemp(join(tmpdir(), 'layer-views-test-'))
 async function load(relative) {
   const source = await readFile(new URL(relative, import.meta.url), 'utf8')

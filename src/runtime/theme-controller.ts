@@ -1,7 +1,8 @@
 import { DataSourceManager, DataSourceTypes, getAppStore } from 'jimu-core'
 import type { JimuMapView } from 'jimu-arcgis'
-import WebMap from 'esri/WebMap'
-import esriConfig from 'esri/config'
+import type WebMap from 'esri/WebMap'
+import { loadArcGISJSAPIModules } from 'jimu-arcgis'
+import type esriConfigType from 'esri/config'
 import { collectVisibility, snapshotVisibility } from './layer-visibility'
 
 import { loadOperationalLayers } from '../shared/layer-loading'
@@ -15,6 +16,7 @@ export type { IControllerState } from './theme-controller-state'
 async function prepareMap(view: JimuMapView, widgetId: string): Promise<IPreparedMap> {
   let saved: WebMap | undefined
   try {
+    const [WebMap, esriConfig] = await loadArcGISJSAPIModules(['esri/WebMap', 'esri/config']) as [typeof import('esri/WebMap').default, typeof esriConfigType]
     await view.view.when()
     const state = getAppStore().getState()
     const appConfig = state.appStateInBuilder?.appConfig ?? state.appConfig

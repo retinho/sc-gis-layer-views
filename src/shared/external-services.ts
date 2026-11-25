@@ -1,5 +1,6 @@
-import WMSLayer from 'esri/layers/WMSLayer'
-import WMTSLayer from 'esri/layers/WMTSLayer'
+import { loadArcGISJSAPIModules } from 'jimu-arcgis'
+import type WMSLayer from 'esri/layers/WMSLayer'
+import type WMTSLayer from 'esri/layers/WMTSLayer'
 import { configureWmsSelection } from './wms-selection'
 import type SpatialReference from 'esri/geometry/SpatialReference'
 import type { IExternalLayer } from '../config'
@@ -13,6 +14,7 @@ export interface IServiceLayerOption {
 
 export async function readServiceLayers(entry: IExternalLayer): Promise<IServiceLayerOption[]> {
   if (!isValidServiceUrl(entry.url)) throw new Error('invalidService')
+  const [WMSLayer, WMTSLayer] = await loadArcGISJSAPIModules(['esri/layers/WMSLayer', 'esri/layers/WMTSLayer']) as [typeof import('esri/layers/WMSLayer').default, typeof import('esri/layers/WMTSLayer').default]
   const layer = entry.type === 'WMS' ? new WMSLayer({ url: entry.url })
     : new WMTSLayer({ url: entry.url, serviceMode: entry.serviceMode })
   try {
@@ -30,6 +32,7 @@ export async function readServiceLayers(entry: IExternalLayer): Promise<IService
 
 export async function createExternalLayer(entry: IExternalLayer, id: string, spatialReference: SpatialReference): Promise<WMSLayer | WMTSLayer> {
   if (!isValidExternalLayer(entry)) throw new Error('invalidService')
+  const [WMSLayer, WMTSLayer] = await loadArcGISJSAPIModules(['esri/layers/WMSLayer', 'esri/layers/WMTSLayer']) as [typeof import('esri/layers/WMSLayer').default, typeof import('esri/layers/WMTSLayer').default]
   const layer = entry.type === 'WMS' ? new WMSLayer({ id, url: entry.url, visible: false })
     : new WMTSLayer({ id, url: entry.url, serviceMode: entry.serviceMode, visible: false })
   let loaded = false
